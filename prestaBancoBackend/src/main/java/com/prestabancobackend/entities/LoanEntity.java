@@ -29,5 +29,4 @@ public class LoanEntity {
     @CollectionTable(name = "loan_requirements", joinColumns = @JoinColumn(name = "loan_id"))
     @Column(name = "requirement")
     private List<String> requirements;
-
 }

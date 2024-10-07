@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "client")
 @Data
@@ -18,6 +20,11 @@ public class ClientEntity {
 
     private String name;
     private String lastName;
+    private Integer rut;
     private String email;
-    private int contact;
+    private Integer contact;
+    private Integer mensualIncome;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ClientLoanEntity> loans;
 }
