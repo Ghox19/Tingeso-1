@@ -1,5 +1,7 @@
 package com.prestabancobackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,7 @@ public class ClientLoanEntity {
     private Integer mensualPay;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "client_id", nullable = false)
     private ClientEntity client;
 

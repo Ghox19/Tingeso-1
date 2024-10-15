@@ -1,13 +1,13 @@
 package com.prestabancobackend.controller;
 
+import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.entities.LoanEntity;
+import com.prestabancobackend.form.ClientLoanForm;
 import com.prestabancobackend.services.ClientLoanService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +21,11 @@ public class ClientLoanController {
         this.clientLoanService = clientLoanService;
     }
 
+    @PostMapping
+    public ResponseEntity<Object> addClientLoan(@RequestBody ClientLoanForm clientLoanForm) {
+        return this.clientLoanService.addClientLoan(clientLoanForm);
+    }
+
     @GetMapping("/{id}")
     public List<ClientLoanEntity> getClientLoansByClient(@PathVariable Long id) {
         return this.clientLoanService.getClientLoanByClient(id);
@@ -29,5 +34,10 @@ public class ClientLoanController {
     @GetMapping
     public List<ClientLoanEntity> getAllClientLoan(){
         return this.clientLoanService.getAllClientLoan();
+    }
+
+    @PostMapping("/calculator")
+    public Integer getMonthlyPay(@RequestBody ClientLoanEntity clientLoan) {
+        return this.clientLoanService.calculateMensualPay(clientLoan);
     }
 }

@@ -22,9 +22,9 @@ public class ClientService {
 
     //Function to add a user
     public ResponseEntity<Object> addClient(ClientEntity client) {
-        Optional<ClientEntity> optionalUser = this.clientRepository.findByEmail(client.getEmail());
+        Optional<ClientEntity> optionalClient = this.clientRepository.findByRut(client.getRut());
 
-        if (optionalUser.isPresent()) {
+        if (optionalClient.isPresent()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
