@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8080';
 
 export const CreditCalculator = () => {
+  const location = useLocation();
+
   const [formData, setFormData] = useState({
     years: '',
     interest: '',
@@ -11,7 +14,7 @@ export const CreditCalculator = () => {
   });
 
   const [rut, setRut] = useState('');
-  const [loanName, setLoanName] = useState('WENA');
+  const [loanName, setLoanName] = useState(location.state.name || '');
   const [labelValue, setLabelValue] = useState('Valor obtenido');
 
   const handleInputChange = (e) => {
@@ -29,6 +32,7 @@ export const CreditCalculator = () => {
   const handleCalculate = async (e) => {
     e.preventDefault();
     try {
+      console.log(loanName)
       const response = await axios.post(`${API_URL}/clientLoan/calculator`, formData);
       const calculatedValue = response.data.toString();
       setLabelValue(calculatedValue);
@@ -77,6 +81,10 @@ export const CreditCalculator = () => {
       console.error('Error registering client:', error);
     }
   };
+
+  useEffect(() => {
+    console.log('Loan data:', location.state);
+  });
 
   return (
     <div>
