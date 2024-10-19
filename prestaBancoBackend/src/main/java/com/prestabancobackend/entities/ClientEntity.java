@@ -24,8 +24,12 @@ public class ClientEntity {
     private String lastName;
     private Integer rut;
     private String email;
+    private Integer years;
     private Integer contact;
+    private String jobType;
     private Integer mensualIncome;
+    private Integer jobYears;
+    private Integer totalDebt;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

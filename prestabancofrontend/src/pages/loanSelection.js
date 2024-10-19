@@ -12,7 +12,6 @@ export const LoanSelection = () => {
       try {
         const response = await axios.get(`${API_URL}/loan`);
         setLoans(response.data);
-        console.log('Loans fetched successfully:', response.data);
       } catch (error) {
         console.error('Error fetching loans:', error);
       }
@@ -32,6 +31,7 @@ export const LoanSelection = () => {
           minInterest={loan.minInterest}
           maxInterest={loan.maxInterest}
           maxAmount={loan.maxAmount}
+          requirements={loan.requirements}
         />
       ))}
     </div>

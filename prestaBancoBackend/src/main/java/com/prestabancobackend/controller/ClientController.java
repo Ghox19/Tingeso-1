@@ -1,6 +1,7 @@
 package com.prestabancobackend.controller;
 
 import com.prestabancobackend.entities.ClientEntity;
+import com.prestabancobackend.form.ClientInfoRequiredForm;
 import com.prestabancobackend.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,11 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public ClientEntity getClientById(@PathVariable Long id) {  return this.clientService.getClientById(id);}
+
+    @GetMapping("/rinfo/{rut}")
+    public ClientInfoRequiredForm getClienRequiredInfoByRut(@PathVariable Integer rut) {
+        return this.clientService.getClientRequiredInfoByRut(rut);
+    }
 
     //Function to delete a user
     @DeleteMapping("/{id}")

@@ -9,8 +9,12 @@ export const Register = () => {
     lastName: '',
     rut: '',
     email: '',
+    years: '',
     contact: '',
-    mensualIncome: ''
+    jobType: '',
+    mensualIncome: '',
+    jobYears: '',
+    totalDebt: ''
   });
 
   const handleChange = (e) => {
@@ -83,6 +87,17 @@ export const Register = () => {
           />
         </div>
         <div>
+          <label htmlFor="years">Edad:</label>
+          <input
+            type="number"
+            id="years"
+            name="years"
+            value={formData.years}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
           <label htmlFor="contact">Contact:</label>
           <input
             type="tel"
@@ -100,6 +115,42 @@ export const Register = () => {
             id="mensualIncome"
             name="mensualIncome"
             value={formData.mensualIncome}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="jobType">Tipo de Trabajo:</label>
+          <select
+            id="jobType"
+            name="jobType"
+            value={formData.jobType}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione una opción</option> {/* Placeholder option */}
+            <option value="empresa">Empresa</option>
+            <option value="independiente">Independiente</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="jobYears">Antiguedad Laboral(En años):</label>
+          <input
+            type="number"
+            id="jobYears"
+            name="jobYears"
+            value={formData.jobYears}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="totalDebt">Deuda Total Actual:</label>
+          <input
+            type="number"
+            id="totalDebt"
+            name="totalDebt"
+            value={formData.totalDebt}
             onChange={handleChange}
             required
           />

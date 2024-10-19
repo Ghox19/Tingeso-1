@@ -1,6 +1,7 @@
 package com.prestabancobackend.services;
 
 import com.prestabancobackend.entities.ClientEntity;
+import com.prestabancobackend.form.ClientInfoRequiredForm;
 import com.prestabancobackend.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,21 @@ public class ClientService {
     public ClientEntity getClientById(long id) {
         Optional<ClientEntity> optionalClient = clientRepository.findById(id);
         return optionalClient.orElse(null);
+    }
+
+    public ClientInfoRequiredForm getClientRequiredInfoByRut(Integer rut){
+        Optional<ClientEntity> optionalClient = clientRepository.findByRut(rut);
+
+        if (optionalClient.isPresent()){
+            ClientInfoRequiredForm clientInfoRequiredForm = new ClientInfoRequiredForm();
+            clientInfoRequiredForm.setYears(optionalClient.get().getYears());
+            clientInfoRequiredForm.setJobYears(optionalClient.get().getJobYears());
+            clientInfoRequiredForm.setMensualIncome(optionalClient.get().getMensualIncome());
+            clientInfoRequiredForm.setJobType(optionalClient.get().getJobType());
+            clientInfoRequiredForm.setTotalDebt(optionalClient.get().getTotalDebt());
+            return clientInfoRequiredForm;
+        }
+
+        return null;
     }
 }
