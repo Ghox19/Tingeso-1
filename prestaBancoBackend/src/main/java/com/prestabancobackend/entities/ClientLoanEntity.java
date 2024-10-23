@@ -3,7 +3,6 @@ package com.prestabancobackend.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,11 +25,16 @@ public class ClientLoanEntity {
     private Float interest;
     private Integer loanAmount;
     private Integer mensualPay;
+    private String fase;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "client_id", nullable = false)
     private ClientEntity client;
+    
+    @OneToMany(mappedBy = "clientLoan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonBackReference
+    private List<DocumentEntity> documents;
 
     @ElementCollection
     private List<Boolean> requirementsApproved;

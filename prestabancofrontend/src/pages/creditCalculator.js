@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { PdfUploader } from '../components/pdfUploader';
 
 const API_URL = 'http://localhost:8080';
 
@@ -18,13 +19,33 @@ export const CreditCalculator = () => {
   const [propertyValue, setPropertyValue] = useState('');
   const [labelValue, setLabelValue] = useState('Valor obtenido');
   const [requirements, setRequirements] = useState(location.state.requirements || []);
+  const [documentsData, setDocumentsData] = useState({});
 
+  const handleDocumentUpload = (json, documentType) => {
+    setDocumentsData(prevState => ({
+        ...prevState,
+        [documentType]: {
+            data: { ...json, type: documentType },
+            status: 'uploaded',
+            fileName: json.fileName
+        }
+    }));
+
+    setFormData(prevState => ({
+        ...prevState,
+        documents: {
+            ...prevState.documents,
+            [documentType]: { ...json, type: documentType }
+        }
+    }));
+};
 
   const [clientData, setClientData] = useState('');
 
   const [documentsValidations, setDocumentsValidations] = useState(
     requirements.map(() => false)
   );
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,14 +143,19 @@ export const CreditCalculator = () => {
       return;
     }
 
-    const debtCuota = (clientData.totalDebt + mensualPay / clientData.mensualIncome) * 100;
+    const totalDebt = parseInt(clientData.totalDebt) + parseInt(mensualPay);
+    console.log('Deuda total:', totalDebt);
+    const debtCuota = (totalDebt / clientData.mensualIncome) * 100;
     console.log('Deuda total:', debtCuota);
     if (debtCuota > 50) {
       console.log('La deuda total excede el 50% del sueldo');
       return;
     }
 
-    if (clientData.years + formData.years > 70) {
+    // Perform the addition
+    const totalYears = parseInt(clientData.years) + parseInt(formData.years);
+    console.log('Total años:', totalYears);
+    if (totalYears > 70) {
       console.log('Muy viejo');
       return;
     }
@@ -142,10 +168,15 @@ export const CreditCalculator = () => {
       loanAmount: formData.loanAmount,
       mensualPay: mensualPay,
       requirementsApproved: [false, false, false],
+      fase: 'En Evaluacion',
+      documents: Object.values(documentsData).map(doc => doc.data)
     };
 
     try {
-      const response = await axios.post(`${API_URL}/clientLoan`, submitData);
+      console.log('Data to send:', submitData);
+      const response = await axios.post(`${API_URL}/clientLoan`, submitData, {
+        headers: { 'Content-Type': 'application/json' }
+      });
       console.log('clienLoan registered successfully:', response.data);
     } catch (error) {
       console.error('Error registering clientLoan:', error);
@@ -204,7 +235,33 @@ export const CreditCalculator = () => {
       <button type="button" onClick={handleCalculate}>Calcular</button>
       <button type="submit" onClick={handleSubmit}>Ingresar</button>
       <ul>
-          {requirements.map((req, index) => (<li key={index}>{req}</li>))}
+          {requirements.map((req, index) => (
+              <li key={index}>
+                  <div className="document-requirement">
+                      <h3>{req}</h3>
+                      <PdfUploader onUpload={(json) => handleDocumentUpload(json, req)} />
+                      {documentsData[req]?.status === 'uploaded' && (
+                          <div className="document-status">
+                              <span className="success">✓ Archivo cargado: {documentsData[req].fileName}</span>
+                              <button 
+                                  onClick={() => {
+                                      setDocumentsData(prev => ({
+                                          ...prev,
+                                          [req]: {
+                                              data: null,
+                                              status: 'pending',
+                                              fileName: null
+                                          }
+                                      }));
+                                  }}
+                              >
+                                  Eliminar
+                              </button>
+                          </div>
+                      )}
+                  </div>
+              </li>
+          ))}
       </ul>
     </div>
   );

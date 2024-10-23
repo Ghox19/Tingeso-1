@@ -1,8 +1,7 @@
 package com.prestabancobackend.controller;
 
-import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.ClientLoanEntity;
-import com.prestabancobackend.entities.LoanEntity;
+import com.prestabancobackend.form.CalculatorForm;
 import com.prestabancobackend.form.ClientLoanForm;
 import com.prestabancobackend.services.ClientLoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,11 @@ public class ClientLoanController {
     }
 
     @GetMapping("/{id}")
+    public ClientLoanEntity getClientLoansById(@PathVariable Long id) {
+        return this.clientLoanService.getClientLoanById(id);
+    }
+
+    @GetMapping("/client/{id}")
     public List<ClientLoanEntity> getClientLoansByClient(@PathVariable Long id) {
         return this.clientLoanService.getClientLoanByClient(id);
     }
@@ -37,7 +41,7 @@ public class ClientLoanController {
     }
 
     @PostMapping("/calculator")
-    public Integer getMonthlyPay(@RequestBody ClientLoanEntity clientLoan) {
-        return this.clientLoanService.calculateMensualPay(clientLoan);
+    public Integer getMonthlyPay(@RequestBody CalculatorForm calculatorForm) {
+        return this.clientLoanService.calculateMensualPay(calculatorForm);
     }
 }

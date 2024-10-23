@@ -1,14 +1,11 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Register } from './pages/register';
-import { LoanSelection } from './pages/loanSelection';
 import routes from './routes/routes';
 
 function App() {
   return (
     <div className="App">
         <header className="App-header">
-          <Register />
           <Router>
             <Routes>
               {routes.map((route, index) => (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { PdfUploader } from '../components/pdfUploader';
 
 const API_URL = 'http://localhost:8080';
 
@@ -14,7 +15,12 @@ export const Register = () => {
     jobType: '',
     mensualIncome: '',
     jobYears: '',
-    totalDebt: ''
+    totalDebt: '',
+    documents: {
+      carnet: null,
+      impuestos: null,
+      deudas: null
+    }
   });
 
   const handleChange = (e) => {
@@ -25,25 +31,41 @@ export const Register = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      console.log('WAAA registered successfully:');
-      const response = await axios.post(`${API_URL}/client`, formData);
-      console.log('Client registered successfully:', response.data);
-      // Handle successful registration (e.g., show success message, redirect)
-    } catch (error) {
-      console.error('Error registering client:', error);
-      // Handle error (e.g., show error message)
-    }
+  const handleDocumentUpload = (json, documentType) => {
+    setFormData(prevState => ({
+        ...prevState,
+        documents: {
+            ...prevState.documents,
+            [documentType]: { ...json, type: documentType }
+        }
+    }));
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const documentsArray = Object.values(formData.documents).filter(doc => doc !== null);
+    const dataToSend = {
+      ...formData,
+      documents: documentsArray
+    };
+    
+    try {
+      console.log('Data to send:', dataToSend);
+      const response = await axios.post(`${API_URL}/client`, dataToSend, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      console.log('Client registered successfully:', response.data);
+    } catch (error) {
+      console.error('Error registering client:', error);
+    }
+  };
+  
   return (
     <div>
       <h1>Register</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name">Name:</label>
+          <label htmlFor="name">Nombre:</label>
           <input
             type="text"
             id="name"
@@ -54,7 +76,7 @@ export const Register = () => {
           />
         </div>
         <div>
-          <label htmlFor="lastName">Last Name:</label>
+          <label htmlFor="lastName">Apellido:</label>
           <input
             type="text"
             id="lastName"
@@ -98,7 +120,7 @@ export const Register = () => {
           />
         </div>
         <div>
-          <label htmlFor="contact">Contact:</label>
+          <label htmlFor="contact">Contacto:</label>
           <input
             type="tel"
             id="contact"
@@ -109,7 +131,7 @@ export const Register = () => {
           />
         </div>
         <div>
-          <label htmlFor="mensualIncome">Monthly Income:</label>
+          <label htmlFor="mensualIncome">Ingreso Mensual:</label>
           <input
             type="number"
             id="mensualIncome"
@@ -154,6 +176,19 @@ export const Register = () => {
             onChange={handleChange}
             required
           />
+        </div>
+        <label>Documentos:</label>
+        <div>
+          <label>Carnet de Identidad</label>
+          <PdfUploader onUpload={(json) => handleDocumentUpload(json, 'carnet')} />
+        </div>
+        <div>
+          <label>Declaracion de Impuestos</label>
+          <PdfUploader onUpload={(json) => handleDocumentUpload(json, 'impuestos')} />
+        </div>
+        <div>
+          <label>Informe de deudas CMF</label>
+          <PdfUploader onUpload={(json) => handleDocumentUpload(json, 'deudas')} />
         </div>
         <button type="submit">Register</button>
       </form>

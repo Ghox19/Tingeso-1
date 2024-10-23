@@ -1,13 +1,17 @@
 package com.prestabancobackend.services;
 
 import com.prestabancobackend.entities.ClientEntity;
+import com.prestabancobackend.entities.DocumentEntity;
 import com.prestabancobackend.form.ClientInfoRequiredForm;
+import com.prestabancobackend.form.DocumentForm;
+import com.prestabancobackend.form.RegisterForm;
 import com.prestabancobackend.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,20 +20,48 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
+    private final DocumentService documentService;
+
     @Autowired
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, DocumentService documentService) {
         this.clientRepository = clientRepository;
+        this.documentService = documentService;
     }
 
     //Function to add a user
-    public ResponseEntity<Object> addClient(ClientEntity client) {
+    public ResponseEntity<Object> addClient(RegisterForm client) {
         Optional<ClientEntity> optionalClient = this.clientRepository.findByRut(client.getRut());
 
         if (optionalClient.isPresent()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        this.clientRepository.save(client);
+        ClientEntity newClient = new ClientEntity();
+        newClient.setName(client.getName());
+        newClient.setLastName(client.getLastName());
+        newClient.setRut(client.getRut());
+        newClient.setEmail(client.getEmail());
+        newClient.setYears(client.getYears());
+        newClient.setContact(client.getContact());
+        newClient.setJobType(client.getJobType());
+        newClient.setMensualIncome(client.getMensualIncome());
+        newClient.setJobYears(client.getJobYears());
+        newClient.setTotalDebt(client.getTotalDebt());
+        newClient.setLoans(new ArrayList<>());
+
+        this.clientRepository.save(newClient);
+
+        List<DocumentForm> documents = client.getDocuments();
+        List<DocumentEntity> realDocuments = new ArrayList<>();
+        for (DocumentForm document : documents) {
+            DocumentEntity documentEntity = this.documentService.saveDocument(document);
+            documentEntity.setClient(newClient);
+            realDocuments.add(documentEntity);
+        }
+
+        newClient.setDocuments(realDocuments);
+
+        this.clientRepository.save(newClient);
 
         return new ResponseEntity<>("Se ingreso correctamente el Usuario", HttpStatus.CREATED);
     }

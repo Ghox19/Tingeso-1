@@ -2,6 +2,7 @@ package com.prestabancobackend.controller;
 
 import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.form.ClientInfoRequiredForm;
+import com.prestabancobackend.form.RegisterForm;
 import com.prestabancobackend.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class ClientController {
 
     //Function to add a user
     @PostMapping
-    public ResponseEntity<Object> addClient(@RequestBody ClientEntity client) {
+    public ResponseEntity<Object> addClient(@RequestBody RegisterForm client) {
         return this.clientService.addClient(client);
     }
 

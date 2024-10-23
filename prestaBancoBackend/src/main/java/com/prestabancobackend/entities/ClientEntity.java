@@ -31,6 +31,10 @@ public class ClientEntity {
     private Integer jobYears;
     private Integer totalDebt;
 
+    @JsonBackReference
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<DocumentEntity> documents;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ClientLoanEntity> loans;
