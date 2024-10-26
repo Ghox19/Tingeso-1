@@ -3,11 +3,11 @@ package com.prestabancobackend.services;
 import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.entities.DocumentEntity;
-import com.prestabancobackend.form.CalculatorForm;
-import com.prestabancobackend.form.ClientLoanForm;
-import com.prestabancobackend.form.DocumentForm;
+import com.prestabancobackend.form.*;
 import com.prestabancobackend.repositories.ClientLoanRepository;
 import com.prestabancobackend.repositories.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +15,16 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ClientLoanService {
 
     private final ClientLoanRepository clientLoanRepository;
     private final ClientRepository clientRepository;
-
     private final DocumentService documentService;
 
     @Autowired
@@ -38,39 +38,54 @@ public class ClientLoanService {
         Optional<ClientEntity> optionalClient = this.clientRepository.findByRut(clientLoanForm.getRut());
 
         if (optionalClient.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity
+                    .badRequest()
+                    .body("No se encontró el cliente con el RUT especificado");
         }
 
         ClientEntity client = optionalClient.get();
+        ClientLoanEntity clientLoan = createAndSaveClientLoan(clientLoanForm, client);
+        List<DocumentEntity> documents = processDocuments(clientLoanForm.getDocuments(), clientLoan);
 
+        updateClientWithLoan(client, clientLoan, documents);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Se ingresó correctamente el préstamo del cliente");
+    }
+
+    private ClientLoanEntity createAndSaveClientLoan(ClientLoanForm form, ClientEntity client) {
         ClientLoanEntity clientLoan = new ClientLoanEntity();
         clientLoan.setClient(client);
-        clientLoan.setLoanAmount(clientLoanForm.getLoanAmount());
-        clientLoan.setLoanName(clientLoanForm.getLoanName());
-        clientLoan.setInterest(clientLoanForm.getInterest());
-        clientLoan.setYears(clientLoanForm.getYears());
-        clientLoan.setMensualPay(clientLoanForm.getMensualPay());
-        clientLoan.setRequirementsApproved(clientLoanForm.getRequirementsApproved());
-        clientLoan.setFase(clientLoanForm.getFase());
+        setClientLoanFields(clientLoan, form);
+        return this.clientLoanRepository.save(clientLoan);
+    }
 
+    private void setClientLoanFields(ClientLoanEntity clientLoan, ClientLoanForm form) {
+        clientLoan.setLoanAmount(form.getLoanAmount());
+        clientLoan.setLoanName(form.getLoanName());
+        clientLoan.setInterest(form.getInterest());
+        clientLoan.setYears(form.getYears());
+        clientLoan.setMensualPay(form.getMensualPay());
+        clientLoan.setRequirementsApproved(form.getRequirementsApproved());
+        clientLoan.setFase(form.getFase());
+    }
+
+    private List<DocumentEntity> processDocuments(List<DocumentForm> documentForms, ClientLoanEntity clientLoan) {
+        return documentForms.stream()
+                .map(docForm -> {
+                    DocumentEntity document = this.documentService.saveDocument(docForm);
+                    document.setClientLoan(clientLoan);
+                    return document;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private void updateClientWithLoan(ClientEntity client, ClientLoanEntity clientLoan,
+                                      List<DocumentEntity> documents) {
+        clientLoan.setDocuments(documents);
         client.getLoans().add(clientLoan);
         this.clientRepository.save(client);
-
-        this.clientLoanRepository.save(clientLoan);
-
-        List<DocumentForm> documents = clientLoanForm.getDocuments();
-        List<DocumentEntity> realDocuments = new ArrayList<>();
-        for (DocumentForm document : documents) {
-            DocumentEntity documentEntity = this.documentService.saveDocument(document);
-            documentEntity.setClientLoan(clientLoan);
-            realDocuments.add(documentEntity);
-        }
-
-        clientLoan.setDocuments(realDocuments);
-
-        this.clientLoanRepository.save(clientLoan);
-
-        return new ResponseEntity<>("Se ingreso correctamente el Usuario", HttpStatus.CREATED);
     }
 
     public List<ClientLoanEntity> getClientLoanByClient(Long id) {
@@ -78,12 +93,44 @@ public class ClientLoanService {
         return optionalClient.map(clientLoanRepository::findByClient).orElse(null);
     }
 
-    public ClientLoanEntity getClientLoanById(Long id){
-        return clientLoanRepository.findById(id).orElse(null);
+    public ClientLoanGetForm getClientLoanById(Long id) {
+        Optional<ClientLoanEntity> clientLoan = clientLoanRepository.findById(id);
+
+        if (clientLoan.isPresent()) {
+            return setClientLoanGetForm(clientLoan.get());
+        } else {
+            throw new EntityNotFoundException("Client Loan not found with id: " + id);
+        }
     }
 
-    public List<ClientLoanEntity> getAllClientLoan (){
-        return clientLoanRepository.findAll();
+    public List<ClientLoanGetForm> getAllClientLoan() {
+        List<ClientLoanEntity> clientLoans = this.clientLoanRepository.findAll();
+
+        return clientLoans.stream()
+                .map(this::setClientLoanGetForm)
+                .collect(Collectors.toList());
+    }
+
+    public ClientLoanGetForm setClientLoanGetForm(ClientLoanEntity clientLoan){
+        ClientLoanGetForm clientLoanGetForm = new ClientLoanGetForm();
+        clientLoanGetForm.setId(clientLoan.getId());
+        clientLoanGetForm.setInterest(clientLoan.getInterest());
+        clientLoanGetForm.setLoanName(clientLoan.getLoanName());
+        clientLoanGetForm.setYears(clientLoan.getYears());
+        clientLoanGetForm.setLoanAmount(clientLoan.getLoanAmount());
+        clientLoanGetForm.setMensualPay(clientLoan.getMensualPay());
+        clientLoanGetForm.setFase(clientLoan.getFase());
+        clientLoanGetForm.setClient(clientLoan.getClient());
+
+        List<DocumentSaveForm> documentForms = clientLoan.getDocuments()
+                .stream()
+                .map(documentService::setDocumentSaveForm)
+                .collect(Collectors.toList());
+
+        clientLoanGetForm.setDocuments(documentForms);
+        clientLoanGetForm.setRequirementsApproved(clientLoan.getRequirementsApproved());
+
+        return clientLoanGetForm;
     }
 
     public Integer calculateMensualPay (CalculatorForm calculatorForm){

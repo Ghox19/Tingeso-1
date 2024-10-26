@@ -28,7 +28,7 @@ public class ClientLoanEntity {
     private String fase;
 
     @ManyToOne
-    @JsonBackReference
+    @JsonManagedReference
     @JoinColumn(name = "client_id", nullable = false)
     private ClientEntity client;
     

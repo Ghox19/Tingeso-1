@@ -1,7 +1,8 @@
 package com.prestabancobackend.controller;
 
-import com.prestabancobackend.entities.ClientEntity;
+import com.prestabancobackend.form.ClientGetForm;
 import com.prestabancobackend.form.ClientInfoRequiredForm;
+import com.prestabancobackend.form.DocumentSaveForm;
 import com.prestabancobackend.form.RegisterForm;
 import com.prestabancobackend.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,15 @@ public class ClientController {
 
     //Function to get all users
     @GetMapping
-    public List<ClientEntity> getAllClients() {
+    public List<ClientGetForm> getAllClients() {
         return this.clientService.getAllClients();
     }
+    
+    @GetMapping("/documents/{id}")
+    public List<DocumentSaveForm> getClientDocuments(@PathVariable Long id){return this.clientService.getClientDocuments(id);}
 
     @GetMapping("/{id}")
-    public ClientEntity getClientById(@PathVariable Long id) {  return this.clientService.getClientById(id);}
+    public ClientGetForm getClientById(@PathVariable Long id) {  return this.clientService.getClientById(id);}
 
     @GetMapping("/rinfo/{rut}")
     public ClientInfoRequiredForm getClienRequiredInfoByRut(@PathVariable Integer rut) {

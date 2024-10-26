@@ -3,6 +3,7 @@ package com.prestabancobackend.controller;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.form.CalculatorForm;
 import com.prestabancobackend.form.ClientLoanForm;
+import com.prestabancobackend.form.ClientLoanGetForm;
 import com.prestabancobackend.services.ClientLoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ClientLoanController {
     }
 
     @GetMapping("/{id}")
-    public ClientLoanEntity getClientLoansById(@PathVariable Long id) {
+    public ClientLoanGetForm getClientLoansById(@PathVariable Long id) {
         return this.clientLoanService.getClientLoanById(id);
     }
 
@@ -36,7 +37,7 @@ public class ClientLoanController {
     }
 
     @GetMapping
-    public List<ClientLoanEntity> getAllClientLoan(){
+    public List<ClientLoanGetForm> getAllClientLoan(){
         return this.clientLoanService.getAllClientLoan();
     }
 

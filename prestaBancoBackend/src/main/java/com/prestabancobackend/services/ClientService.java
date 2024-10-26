@@ -2,10 +2,10 @@ package com.prestabancobackend.services;
 
 import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.DocumentEntity;
-import com.prestabancobackend.form.ClientInfoRequiredForm;
-import com.prestabancobackend.form.DocumentForm;
-import com.prestabancobackend.form.RegisterForm;
+import com.prestabancobackend.form.*;
 import com.prestabancobackend.repositories.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ClientService {
 
     private final ClientRepository clientRepository;
@@ -29,46 +31,85 @@ public class ClientService {
     }
 
     //Function to add a user
-    public ResponseEntity<Object> addClient(RegisterForm client) {
-        Optional<ClientEntity> optionalClient = this.clientRepository.findByRut(client.getRut());
-
-        if (optionalClient.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Object> addClient(RegisterForm clientForm) {
+        if (this.clientRepository.findByRut(clientForm.getRut()).isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Ya existe un cliente con el RUT especificado");
         }
 
-        ClientEntity newClient = new ClientEntity();
-        newClient.setName(client.getName());
-        newClient.setLastName(client.getLastName());
-        newClient.setRut(client.getRut());
-        newClient.setEmail(client.getEmail());
-        newClient.setYears(client.getYears());
-        newClient.setContact(client.getContact());
-        newClient.setJobType(client.getJobType());
-        newClient.setMensualIncome(client.getMensualIncome());
-        newClient.setJobYears(client.getJobYears());
-        newClient.setTotalDebt(client.getTotalDebt());
-        newClient.setLoans(new ArrayList<>());
+        ClientEntity newClient = createClientFromForm(clientForm);
+        newClient = this.clientRepository.save(newClient);
 
+        List<DocumentEntity> documents = processDocuments(clientForm.getDocuments(), newClient);
+        newClient.setDocuments(documents);
+
+        // Un solo save final que actualiza la entidad con todos sus documentos
         this.clientRepository.save(newClient);
 
-        List<DocumentForm> documents = client.getDocuments();
-        List<DocumentEntity> realDocuments = new ArrayList<>();
-        for (DocumentForm document : documents) {
-            DocumentEntity documentEntity = this.documentService.saveDocument(document);
-            documentEntity.setClient(newClient);
-            realDocuments.add(documentEntity);
-        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Se ingresó correctamente el Usuario");
+    }
 
-        newClient.setDocuments(realDocuments);
+    private ClientEntity createClientFromForm(RegisterForm form) {
+        ClientEntity client = new ClientEntity();
+        client.setName(form.getName());
+        client.setLastName(form.getLastName());
+        client.setRut(form.getRut());
+        client.setEmail(form.getEmail());
+        client.setYears(form.getYears());
+        client.setContact(form.getContact());
+        client.setJobType(form.getJobType());
+        client.setMensualIncome(form.getMensualIncome());
+        client.setJobYears(form.getJobYears());
+        client.setTotalDebt(form.getTotalDebt());
+        client.setLoans(new ArrayList<>());
+        return client;
+    }
 
-        this.clientRepository.save(newClient);
-
-        return new ResponseEntity<>("Se ingreso correctamente el Usuario", HttpStatus.CREATED);
+    private List<DocumentEntity> processDocuments(List<DocumentForm> documentForms, ClientEntity client) {
+        return documentForms.stream()
+                .map(docForm -> {
+                    DocumentEntity document = this.documentService.saveDocument(docForm);
+                    document.setClient(client);
+                    return document;
+                })
+                .collect(Collectors.toList());
     }
 
     //Function to get all users
-    public List<ClientEntity> getAllClients() {
-        return this.clientRepository.findAll();
+    public List<ClientGetForm> getAllClients() {
+        List<ClientEntity> clients = this.clientRepository.findAll();
+
+        return clients.stream()
+                .map(this::setClientGetForm)
+                .collect(Collectors.toList());
+    }
+
+    public ClientGetForm setClientGetForm(ClientEntity client){
+        ClientGetForm clientGetForm = new ClientGetForm();
+        clientGetForm.setId(client.getId());
+        clientGetForm.setName(client.getName());
+        clientGetForm.setLastName(client.getLastName());
+        clientGetForm.setRut(client.getRut());
+        clientGetForm.setEmail(client.getEmail());
+        clientGetForm.setYears(client.getYears());
+        clientGetForm.setContact(client.getContact());
+        clientGetForm.setJobType(client.getJobType());
+        clientGetForm.setMensualIncome(client.getMensualIncome());
+        clientGetForm.setJobYears(client.getJobYears());
+        clientGetForm.setTotalDebt(client.getTotalDebt());
+
+        List<DocumentSaveForm> documentForms = client.getDocuments()
+                .stream()
+                .map(documentService::setDocumentSaveForm)
+                .collect(Collectors.toList());
+
+        clientGetForm.setDocuments(documentForms);
+
+        clientGetForm.setLoans(client.getLoans());
+        return clientGetForm;
     }
 
     //Function to delete a user
@@ -81,9 +122,25 @@ public class ClientService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ClientEntity getClientById(long id) {
-        Optional<ClientEntity> optionalClient = clientRepository.findById(id);
-        return optionalClient.orElse(null);
+    public ClientGetForm getClientById(Long id) {
+        Optional<ClientEntity> client = clientRepository.findById(id);
+
+        if (client.isPresent()) {
+            return setClientGetForm(client.get());
+        } else {
+            throw new EntityNotFoundException("Client Loan not found with id: " + id);
+        }
+    }
+
+    public List<DocumentSaveForm> getClientDocuments(Long id){
+        ClientGetForm client = getClientById(id);
+
+        if (client != null){
+            return client.getDocuments();
+        }
+        else {
+            return null;
+        }
     }
 
     public ClientInfoRequiredForm getClientRequiredInfoByRut(Integer rut){

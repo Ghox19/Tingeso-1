@@ -2,6 +2,7 @@ package com.prestabancobackend.services;
 
 import com.prestabancobackend.entities.DocumentEntity;
 import com.prestabancobackend.form.DocumentForm;
+import com.prestabancobackend.form.DocumentSaveForm;
 import com.prestabancobackend.repositories.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,5 +46,13 @@ public class DocumentService {
         document.setName(file.getOriginalFilename());
         document.setContent(file.getBytes());
         return document;
+    }
+
+    public DocumentSaveForm setDocumentSaveForm(DocumentEntity document){
+        DocumentSaveForm documentSaveForm = new DocumentSaveForm();
+        documentSaveForm.setId(document.getId());
+        documentSaveForm.setName(document.getName());
+        documentSaveForm.setType(document.getType());
+        return documentSaveForm;
     }
 }
