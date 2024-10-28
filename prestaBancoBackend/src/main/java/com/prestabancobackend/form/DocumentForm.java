@@ -7,4 +7,5 @@ public class DocumentForm {
     private String name;
     private String content;
     private String type;
+    private Boolean approved;
 }

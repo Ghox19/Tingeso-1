@@ -27,6 +27,7 @@ public class DocumentService {
         documentEntity.setContent(contentBytes);
 
         documentEntity.setType(documentForm.getType());
+        documentEntity.setApproved(documentForm.getApproved());
 
         documentRepository.save(documentEntity);
         // Save the document entity
@@ -53,6 +54,7 @@ public class DocumentService {
         documentSaveForm.setId(document.getId());
         documentSaveForm.setName(document.getName());
         documentSaveForm.setType(document.getType());
+        documentSaveForm.setApproved(document.getApproved());
         return documentSaveForm;
     }
 }

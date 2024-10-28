@@ -18,5 +18,4 @@ public class ClientLoanGetForm {
     private ClientEntity client;
 
     private List<DocumentSaveForm> documents;
-    private List<Boolean> requirementsApproved;
 }

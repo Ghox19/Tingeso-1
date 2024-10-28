@@ -24,6 +24,8 @@ public class DocumentEntity {
 
     private String type;
 
+    private Boolean approved;
+
     @ManyToOne
     @JsonManagedReference
     @JoinColumn(name = "client_id", nullable = true)

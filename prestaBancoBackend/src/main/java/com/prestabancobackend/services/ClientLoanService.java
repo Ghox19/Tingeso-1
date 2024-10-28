@@ -67,7 +67,6 @@ public class ClientLoanService {
         clientLoan.setInterest(form.getInterest());
         clientLoan.setYears(form.getYears());
         clientLoan.setMensualPay(form.getMensualPay());
-        clientLoan.setRequirementsApproved(form.getRequirementsApproved());
         clientLoan.setFase(form.getFase());
     }
 
@@ -128,7 +127,6 @@ public class ClientLoanService {
                 .collect(Collectors.toList());
 
         clientLoanGetForm.setDocuments(documentForms);
-        clientLoanGetForm.setRequirementsApproved(clientLoan.getRequirementsApproved());
 
         return clientLoanGetForm;
     }

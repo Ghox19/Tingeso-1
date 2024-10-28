@@ -22,29 +22,23 @@ export const CreditCalculator = () => {
   const [documentsData, setDocumentsData] = useState({});
 
   const handleDocumentUpload = (json, documentType) => {
+    const documentData = {
+        ...json,
+        type: documentType,
+        approved: false  // Aseguramos que approved se incluya
+    };
+
     setDocumentsData(prevState => ({
         ...prevState,
         [documentType]: {
-            data: { ...json, type: documentType },
+            data: documentData,
             status: 'uploaded',
             fileName: json.fileName
         }
     }));
-
-    setFormData(prevState => ({
-        ...prevState,
-        documents: {
-            ...prevState.documents,
-            [documentType]: { ...json, type: documentType }
-        }
-    }));
-};
+  };
 
   const [clientData, setClientData] = useState('');
-
-  const [documentsValidations, setDocumentsValidations] = useState(
-    requirements.map(() => false)
-  );
   
 
   const handleInputChange = (e) => {
@@ -160,16 +154,20 @@ export const CreditCalculator = () => {
       return;
     }
 
+    const documents = Object.values(documentsData).map(doc => ({
+      ...doc.data,
+        approved: false  // Aseguramos que cada documento tenga approved
+    }));
+
     const submitData = {
-      rut: rut,
-      loanName: loanName,
-      years: formData.years,
-      interest: formData.interest,
-      loanAmount: formData.loanAmount,
-      mensualPay: mensualPay,
-      requirementsApproved: [false, false, false],
-      fase: 'En Evaluacion',
-      documents: Object.values(documentsData).map(doc => doc.data)
+        rut: rut,
+        loanName: loanName,
+        years: formData.years,
+        interest: formData.interest,
+        loanAmount: formData.loanAmount,
+        mensualPay: mensualPay,
+        fase: 'En Evaluacion',
+        documents: documents
     };
 
     try {
@@ -187,10 +185,6 @@ export const CreditCalculator = () => {
   useEffect(() => {
     setLabelValue('Valor obtenido');
   }, [formData.years, formData.interest, formData.loanAmount, propertyValue]);
-
-  useEffect(() => {
-    console.log('Loan data:', documentsValidations);
-  }, [location.state]);
 
   return (
     <div>
@@ -243,20 +237,6 @@ export const CreditCalculator = () => {
                       {documentsData[req]?.status === 'uploaded' && (
                           <div className="document-status">
                               <span className="success">✓ Archivo cargado: {documentsData[req].fileName}</span>
-                              <button 
-                                  onClick={() => {
-                                      setDocumentsData(prev => ({
-                                          ...prev,
-                                          [req]: {
-                                              data: null,
-                                              status: 'pending',
-                                              fileName: null
-                                          }
-                                      }));
-                                  }}
-                              >
-                                  Eliminar
-                              </button>
                           </div>
                       )}
                   </div>

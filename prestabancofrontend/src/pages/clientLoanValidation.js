@@ -51,7 +51,7 @@ export const ClientLoanValidation = () => {
       }
     };
 
-    const fetchClientDocuments = async () => {
+    const fetchClientDocuments = async (id) => {
       try {
         const response = await axios.get(`${API_URL}/client/documents/${id}`);
         console.log(response.data);
@@ -79,6 +79,7 @@ export const ClientLoanValidation = () => {
             <li key={doc.id}>
                 <span>Nombre: {doc.name}</span>
                 <span>Tipo: {doc.type}</span>
+                <span>Estado: {doc.approved ? "Aprobado" : "No aprobado"}</span>
                 <button onClick={() => handleDownload(doc.id, doc.name)}>
                     Descargar
                 </button>
@@ -93,6 +94,7 @@ export const ClientLoanValidation = () => {
             <li key={doc.id}>
                 <span>Nombre: {doc.name}</span>
                 <span>Tipo: {doc.type}</span>
+                <span>Estado: {doc.approved ? "Aprobado" : "No aprobado"}</span>
                 <button onClick={() => handleDownload(doc.id, doc.name)}>
                     Descargar
                 </button>

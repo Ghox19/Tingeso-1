@@ -36,7 +36,7 @@ export const Register = () => {
         ...prevState,
         documents: {
             ...prevState.documents,
-            [documentType]: { ...json, type: documentType }
+            [documentType]: { ...json, type: documentType, approved: false }
         }
     }));
   };

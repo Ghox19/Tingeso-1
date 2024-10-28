@@ -16,7 +16,5 @@ public class ClientLoanForm {
     private Integer mensualPay;
     private String fase;
 
-    private List<Boolean> requirementsApproved;
-
     private List<DocumentForm> documents;
 }

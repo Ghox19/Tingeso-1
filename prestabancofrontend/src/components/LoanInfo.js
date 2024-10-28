@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay }) => {
+export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay, rut}) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -20,6 +20,7 @@ export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay }
         <li><strong>Interés:</strong> {interest}%</li>
         <li><strong>Monto del Préstamo:</strong> ${loanAmount}</li>
         <li><strong>Pago Mensual:</strong> ${mensualPay}</li>
+        <li><strong>RUT:</strong> {rut}</li>
         <button onClick={handleClick}>Solicitar Préstamo</button>
       </ul>
     </div>

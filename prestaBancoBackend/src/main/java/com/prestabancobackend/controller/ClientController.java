@@ -33,7 +33,7 @@ public class ClientController {
     public List<ClientGetForm> getAllClients() {
         return this.clientService.getAllClients();
     }
-    
+
     @GetMapping("/documents/{id}")
     public List<DocumentSaveForm> getClientDocuments(@PathVariable Long id){return this.clientService.getClientDocuments(id);}
 

@@ -35,7 +35,4 @@ public class ClientLoanEntity {
     @OneToMany(mappedBy = "clientLoan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonBackReference
     private List<DocumentEntity> documents;
-
-    @ElementCollection
-    private List<Boolean> requirementsApproved;
 }
