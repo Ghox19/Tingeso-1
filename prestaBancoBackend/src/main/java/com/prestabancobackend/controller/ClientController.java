@@ -1,8 +1,8 @@
 package com.prestabancobackend.controller;
 
-import com.prestabancobackend.form.ClientGetForm;
+import com.prestabancobackend.getForms.ClientGetForm;
 import com.prestabancobackend.form.ClientInfoRequiredForm;
-import com.prestabancobackend.form.DocumentSaveForm;
+import com.prestabancobackend.getForms.DocumentSaveForm;
 import com.prestabancobackend.form.RegisterForm;
 import com.prestabancobackend.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;

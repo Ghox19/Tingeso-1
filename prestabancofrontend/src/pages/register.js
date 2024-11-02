@@ -19,7 +19,8 @@ export const Register = () => {
     documents: {
       carnet: null,
       impuestos: null,
-      deudas: null
+      deudas: null,
+      ahorros: null
     }
   });
 
@@ -189,6 +190,10 @@ export const Register = () => {
         <div>
           <label>Informe de deudas CMF</label>
           <PdfUploader onUpload={(json) => handleDocumentUpload(json, 'deudas')} />
+        </div>
+        <div>
+          <label>Cuenta de Ahorros</label>
+          <PdfUploader onUpload={(json) => handleDocumentUpload(json, 'ahorros')} />
         </div>
         <button type="submit">Register</button>
       </form>

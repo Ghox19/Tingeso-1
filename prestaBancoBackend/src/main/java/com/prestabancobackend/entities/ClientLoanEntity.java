@@ -27,6 +27,10 @@ public class ClientLoanEntity {
     private Integer mensualPay;
     private String fase;
 
+    @OneToOne(mappedBy = "clientLoan")
+    @JsonManagedReference
+    private SavingEntity saving;
+
     @ManyToOne
     @JsonManagedReference
     @JoinColumn(name = "client_id", nullable = false)

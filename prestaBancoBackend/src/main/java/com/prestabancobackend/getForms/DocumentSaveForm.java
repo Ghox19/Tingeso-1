@@ -1,4 +1,4 @@
-package com.prestabancobackend.form;
+package com.prestabancobackend.getForms;
 
 import lombok.Data;
 

@@ -3,7 +3,7 @@ package com.prestabancobackend.controller;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.form.CalculatorForm;
 import com.prestabancobackend.form.ClientLoanForm;
-import com.prestabancobackend.form.ClientLoanGetForm;
+import com.prestabancobackend.getForms.ClientLoanGetForm;
 import com.prestabancobackend.services.ClientLoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

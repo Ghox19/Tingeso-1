@@ -3,6 +3,8 @@ package com.prestabancobackend.services;
 import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.DocumentEntity;
 import com.prestabancobackend.form.*;
+import com.prestabancobackend.getForms.ClientGetForm;
+import com.prestabancobackend.getForms.DocumentSaveForm;
 import com.prestabancobackend.repositories.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

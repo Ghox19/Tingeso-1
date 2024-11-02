@@ -2,7 +2,7 @@ package com.prestabancobackend.services;
 
 import com.prestabancobackend.entities.DocumentEntity;
 import com.prestabancobackend.form.DocumentForm;
-import com.prestabancobackend.form.DocumentSaveForm;
+import com.prestabancobackend.getForms.DocumentSaveForm;
 import com.prestabancobackend.repositories.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

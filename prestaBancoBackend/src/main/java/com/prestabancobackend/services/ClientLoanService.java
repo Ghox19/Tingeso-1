@@ -4,6 +4,8 @@ import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.entities.DocumentEntity;
 import com.prestabancobackend.form.*;
+import com.prestabancobackend.getForms.ClientLoanGetForm;
+import com.prestabancobackend.getForms.DocumentSaveForm;
 import com.prestabancobackend.repositories.ClientLoanRepository;
 import com.prestabancobackend.repositories.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,6 +46,55 @@ public class ClientLoanService {
         }
 
         ClientEntity client = optionalClient.get();
+
+        if (clientLoanForm.getRut() == null || clientLoanForm.getYears() == null ||
+                clientLoanForm.getInterest() == null || clientLoanForm.getLoanAmount() == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Faltan datos requeridos");
+        }
+
+        // Validate monthly payment calculation
+        double mensualPay = clientLoanForm.getMensualPay();
+        if (mensualPay == 0) { // Assuming 0 represents "Valor obtenido"
+            return ResponseEntity
+                    .badRequest()
+                    .body("Falta calcular el valor de la cuota mensual");
+        }
+
+        // Check monthly payment to income ratio
+        double cuotaIncome = (mensualPay / client.getMensualIncome()) * 100;
+        if (cuotaIncome > 35) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("La cuota mensual excede el 35% del sueldo");
+        }
+
+        // Validate job years
+        if (client.getJobYears() < 1) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("El cliente no tiene la antigüedad laboral mínima requerida (1 año)");
+        }
+
+        // Calculate and validate total debt ratio
+        double totalDebt = client.getTotalDebt() + mensualPay;
+        double debtCuota = (totalDebt / client.getMensualIncome()) * 100;
+        if (debtCuota > 50) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("La deuda total excede el 50% del sueldo mensual");
+        }
+
+        // Validate age limit
+        int totalYears = client.getYears() + clientLoanForm.getYears();
+        if (totalYears > 70) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("El cliente excede el límite de edad permitido (70 años)");
+        }
+
+
         ClientLoanEntity clientLoan = createAndSaveClientLoan(clientLoanForm, client);
         List<DocumentEntity> documents = processDocuments(clientLoanForm.getDocuments(), clientLoan);
 
@@ -102,6 +153,12 @@ public class ClientLoanService {
         }
     }
 
+    public ClientLoanEntity getClientLoanbyIdRaw(Long id){
+        Optional<ClientLoanEntity> clientLoan = clientLoanRepository.findById(id);
+
+        return clientLoan.orElse(null);
+    }
+
     public List<ClientLoanGetForm> getAllClientLoan() {
         List<ClientLoanEntity> clientLoans = this.clientLoanRepository.findAll();
 
@@ -120,6 +177,7 @@ public class ClientLoanService {
         clientLoanGetForm.setMensualPay(clientLoan.getMensualPay());
         clientLoanGetForm.setFase(clientLoan.getFase());
         clientLoanGetForm.setClient(clientLoan.getClient());
+        clientLoanGetForm.setSavings(clientLoan.getSaving());
 
         List<DocumentSaveForm> documentForms = clientLoan.getDocuments()
                 .stream()

@@ -1,6 +1,7 @@
-package com.prestabancobackend.form;
+package com.prestabancobackend.getForms;
 
 import com.prestabancobackend.entities.ClientEntity;
+import com.prestabancobackend.entities.SavingEntity;
 import lombok.Data;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public class ClientLoanGetForm {
     private Integer mensualPay;
     private String fase;
     private ClientEntity client;
+
+    private SavingEntity savings;
 
     private List<DocumentSaveForm> documents;
 }
