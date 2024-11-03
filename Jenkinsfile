@@ -33,6 +33,7 @@ pipeline {
 
                 script {
                     if (isUnix()) {
+                        sh 'docker login'
                         sh 'docker push ghox19/backend-presta-banco:latest'
                     } else {
                         bat 'docker push ghox19/backend-presta-banco:latest'
