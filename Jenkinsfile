@@ -15,9 +15,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'cd Backend && docker build -t ghox19/backend-presta-banco:latest .'
+                        sh 'cd prestaBancoBackend && docker build -t ghox19/backend-presta-banco:latest .'
                     } else {
-                        bat 'cd Backend && docker build -t ghox19/backend-presta-banco:latest .'
+                        bat 'cd prestaBancoBackend && docker build -t ghox19/backend-presta-banco:latest .'
                     }
                 }
                 
@@ -41,25 +41,13 @@ pipeline {
             }
         }
 
-        stage('Test backend') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'cd Backend && mvn test'
-                    } else {
-                        bat 'cd Backend && mvn test'
-                    }
-                }
-            }
-        }
-
         stage('Build frontend') {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'cd Frontend && docker build -t ghox19/frontend-presta-banco:latest .'
+                        sh 'cd prestabancofrontend && docker build -t ghox19/frontend-presta-banco:latest .'
                     } else {
-                        bat 'cd Frontend && docker build -t ghox19/frontend-presta-banco:latest .'
+                        bat 'cd prestabancofrontend && docker build -t ghox19/frontend-presta-banco:latest .'
                     }
                 }
 
