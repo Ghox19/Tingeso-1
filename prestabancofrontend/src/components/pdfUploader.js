@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://104.41.28.230';
 
 export function PdfUploader({ onUpload, documentType }) {
     const handleFileChange = (event) => {

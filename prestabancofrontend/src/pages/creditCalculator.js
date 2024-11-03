@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { PdfUploader } from '../components/pdfUploader';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://104.41.28.230';
 
 export const CreditCalculator = () => {
   const location = useLocation();

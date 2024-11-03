@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  # Backend
+  backend1:
+    image: ghox19/backend-presta-banco:latest
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PORT=${PORT}
+    networks:
+      - app-network
+    expose:
+      - "8090"  
+
+  backend2:
+    image: ghox19/backend-presta-banco:latest
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PORT=${PORT}  
+    networks:
+      - app-network
+    expose:
+      - "8090"   
+
+  backend3:
+    image: ghox19/backend-presta-banco:latest
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PORT=${PORT}
+    networks:
+      - app-network
+    expose:
+      - "8090"  
+
+  # Frontend
+  frontend1:
+    image: ghox19/frontend-presta-banco:latest
+    networks:
+      - app-network
+
+  frontend2:
+    image: ghox19/frontend-presta-banco:latest
+    networks:
+      - app-network
+
+  frontend3:
+    image: ghox19/frontend-presta-banco:latest
+    networks:
+      - app-network
+
+  # nginx para el frontend
+  nginx-frontend:
+    image: nginx:latest
+    volumes:
+      - ./nginx-frontend.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8070:80"   
+    depends_on:
+      - frontend1
+      - frontend2
+      - frontend3
+    networks:
+      - app-network
+
+  # nginx para el backend
+  nginx-backend:
+    image: nginx:latest
+    volumes:
+      - ./nginx-backend.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8090:8090"  
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - app-network
+
+networks:
+  app-network:

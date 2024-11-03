@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { PdfUploader } from '../components/pdfUploader';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://104.41.28.230';
 
 export const Register = () => {
   const [formData, setFormData] = useState({

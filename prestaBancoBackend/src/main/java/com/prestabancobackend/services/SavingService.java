@@ -1,10 +1,8 @@
 package com.prestabancobackend.services;
 
-import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.entities.SavingEntity;
 import com.prestabancobackend.form.SavingForm;
-import com.prestabancobackend.getForms.ClientGetForm;
 import com.prestabancobackend.getForms.ClientLoanGetForm;
 import com.prestabancobackend.getForms.SavingGetForm;
 import com.prestabancobackend.repositories.ClientLoanRepository;
@@ -69,6 +67,7 @@ public class SavingService {
 
     private SavingEntity createSavingFromForm(SavingForm form, ClientLoanEntity clientLoan) {
         SavingEntity saving = new SavingEntity();
+        saving.setActualBalance(form.getActualBalance());
         saving.setBalances(form.getBalances());
         saving.setDeposit(form.getDeposit());
         saving.setYears(form.getYears());

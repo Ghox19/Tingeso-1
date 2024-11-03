@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://104.41.28.230';
 
 export const ClientLoanValidation = () => {
+  const navigate = useNavigate();
   const location = useLocation();
 
   const { id } = location.state || {};  // Extrae id del estado
@@ -36,6 +37,10 @@ export const ClientLoanValidation = () => {
     } catch (error) {
         console.error('Error downloading the document', error);
     }
+  };
+  
+  const handleSavings = async () => {
+    navigate('/savingValidation', { state: {id}});
   };
 
   useEffect(() => {
@@ -89,6 +94,8 @@ export const ClientLoanValidation = () => {
         <li><strong>RUT:</strong> {client.rut}</li>
         <li><strong>Nombre:</strong> {client.name + " " +client.lastName}</li>
         <li><strong>Contacto:</strong> {client.contact}</li>
+        <li><strong>Correo:</strong> {client.email}</li>
+        <li><strong>Sueldo:</strong> {client.mensualIncome}</li>
         <h3>Documentos Clientes</h3>
         {clientDocuments?.map((doc) => (
             <li key={doc.id}>
@@ -100,6 +107,7 @@ export const ClientLoanValidation = () => {
                 </button>
             </li>
         ))}
+        <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
       </ul>
     </div>
   );

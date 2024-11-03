@@ -5,6 +5,7 @@ import { Register } from '../pages/register';
 import { CreditCalculator } from '../pages/creditCalculator';
 import { ClientLoanPage } from '../pages/clientLoanPage';
 import { ClientLoanValidation } from '../pages/clientLoanValidation';
+import { SavingValidation } from '../pages/savingValidation';
 import { Test } from '../pages/test';
 
 const routes = [
@@ -13,7 +14,8 @@ const routes = [
   { path: '/register', element: <Register /> },
   { path: '/creditCalculator', element: <CreditCalculator /> },
   { path: '/loanCollection', element: <ClientLoanPage /> },
-  { path: '/loanValidation', element: <ClientLoanValidation />}
+  { path: '/loanValidation', element: <ClientLoanValidation />},
+  { path: '/savingValidation', element: <SavingValidation />}
 ];
 
 export default routes;
