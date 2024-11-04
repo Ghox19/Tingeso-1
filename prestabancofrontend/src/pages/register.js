@@ -63,22 +63,22 @@ export const Register = () => {
   };
   
   return (
-    <div className="min-h-screen bg-[#282C35] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl p-8">
-        <h1 className="text-3xl font-bold text-center text-[#3D2A3B] mb-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto bg-[#282C35] rounded-lg shadow-lg border border-gray-700 p-8">
+        <h1 className="text-3xl font-bold text-white text-center mb-8">
           Registro de Usuario
         </h1>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information Section */}
-          <div className="bg-[#2F3429]/10 p-6 rounded-lg space-y-4">
-            <h2 className="text-xl font-semibold text-[#2A353D] mb-4">
+          <div className="bg-[#2A353D] p-6 rounded-lg space-y-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               Información Personal
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="block text-sm font-medium text-white ">
                   Nombre
                 </label>
                 <input
@@ -88,12 +88,12 @@ export const Register = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] text-black sm:text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="lastName" className="block text-sm font-medium text-white">
                   Apellido
                 </label>
                 <input
@@ -103,12 +103,12 @@ export const Register = () => {
                   value={formData.lastName}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="rut" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="rut" className="block text-sm font-medium text-white ">
                   RUT
                 </label>
                 <input
@@ -118,12 +118,12 @@ export const Register = () => {
                   value={formData.rut}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-white ">
                   Email
                 </label>
                 <input
@@ -133,12 +133,12 @@ export const Register = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="years" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="years" className="block text-sm font-medium text-white">
                   Edad
                 </label>
                 <input
@@ -148,12 +148,12 @@ export const Register = () => {
                   value={formData.years}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="contact" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="contact" className="block text-sm font-medium text-white">
                   Contacto
                 </label>
                 <input
@@ -163,21 +163,21 @@ export const Register = () => {
                   value={formData.contact}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* Financial Information Section */}
-          <div className="bg-[#2F3429]/10 p-6 rounded-lg space-y-4">
-            <h2 className="text-xl font-semibold text-[#2A353D] mb-4">
+          <div className="bg-[#2A353D] p-6 rounded-lg space-y-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               Información Financiera
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="mensualIncome" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="mensualIncome" className="block text-sm font-medium text-white">
                   Ingreso Mensual
                 </label>
                 <input
@@ -187,12 +187,12 @@ export const Register = () => {
                   value={formData.mensualIncome}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="jobType" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="jobType" className="block text-sm font-medium text-white">
                   Tipo de Trabajo
                 </label>
                 <select
@@ -201,7 +201,7 @@ export const Register = () => {
                   value={formData.jobType}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 >
                   <option value="">Seleccione una opción</option>
                   <option value="empresa">Empresa</option>
@@ -210,7 +210,7 @@ export const Register = () => {
               </div>
 
               <div>
-                <label htmlFor="jobYears" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="jobYears" className="block text-sm font-medium text-white">
                   Antiguedad Laboral (años)
                 </label>
                 <input
@@ -220,12 +220,12 @@ export const Register = () => {
                   value={formData.jobYears}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="totalDebt" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="totalDebt" className="block text-sm font-medium text-white">
                   Deuda Total Actual
                 </label>
                 <input
@@ -235,21 +235,21 @@ export const Register = () => {
                   value={formData.totalDebt}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black focus:border-[#3D2A3B] focus:ring-[#3D2A3B] sm:text-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* Documents Section */}
-          <div className="bg-[#2F3429]/10 p-6 rounded-lg space-y-4">
-            <h2 className="text-xl font-semibold text-[#2A353D] mb-4">
+          <div className="bg-[#2A353D] p-6 rounded-lg space-y-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               Documentos Requeridos
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Carnet de Identidad
                 </label>
                 <PdfUploader 
@@ -259,7 +259,7 @@ export const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Declaración de Impuestos
                 </label>
                 <PdfUploader 
@@ -269,7 +269,7 @@ export const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Informe de deudas CMF
                 </label>
                 <PdfUploader 
@@ -279,7 +279,7 @@ export const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Cuenta de Ahorros
                 </label>
                 <PdfUploader 

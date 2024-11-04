@@ -23,7 +23,7 @@ export const ClientLoanPage = () => {
 
   return (
     <div>
-      <h2>Información del Préstamo</h2>
+      <h2>Solicitudes de Prestamo</h2>
       {loans.map((loan) => (
         <LoanInfo
           key={loan.id}

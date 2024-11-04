@@ -187,62 +187,116 @@ export const CreditCalculator = () => {
   }, [formData.years, formData.interest, formData.loanAmount, propertyValue]);
 
   return (
-    <div>
-      <input 
-        type='text'
-        name='rut'
-        placeholder='RUT' 
-        value={rut} 
-        onChange={handleInputChange} 
-      />
-      <button type="validate" onClick={handleValidate}>Validar</button>
-      <label>{loanName}</label> 
-      <input 
-        type='number'
-        name='years'
-        placeholder='Años' 
-        value={formData.years} 
-        onChange={handleInputChange} 
-      />
-      <input 
-        type='number'
-        name='interest'
-        placeholder='Interés' 
-        value={formData.interest} 
-        onChange={handleInputChange} 
-      />
-      <input 
-        type='number'
-        name='loanAmount'
-        placeholder='Monto del Préstamo' 
-        value={formData.loanAmount} 
-        onChange={handleInputChange} 
-      />
-      <input 
-        type='number'
-        name='propertyValue'
-        placeholder='Valor de la Propiedad' 
-        value={propertyValue} 
-        onChange={handleInputChange} 
-      />
-      <label>{labelValue}</label> 
-      <button type="button" onClick={handleCalculate}>Calcular</button>
-      <button type="submit" onClick={handleSubmit}>Ingresar</button>
-      <ul>
+    <div className="min-h-screen  p-8">
+      <div className="max-w-5xl mx-auto space-y-12">
+        {/* Sección superior */}
+        <div className="flex gap-4">
+          <div className="bg-[#2a3138] p-6 mx-10 rounded-lg shadow-lg">
+            <div className="flex mb-6">
+              <input 
+                type="text"
+                name="rut"
+                placeholder="RUT"
+                value={rut}
+                onChange={handleInputChange}
+                className="flex-grow px-4 py-2 bg-white/90 text-xl rounded-md"
+              />
+              <button 
+                type="validate" 
+                onClick={handleValidate}
+                className="px-6 py-2 bg-[#3D2A3B] text-xl text-white rounded-md hover:bg-opacity-90"
+              >
+                Validar
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-white text-xl mb-2">Interes</label>
+                <input 
+                  type="number"
+                  placeholder="Porcentaje %"
+                  name="interest"
+                  value={formData.interest}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 bg-white/90 text-xl text-black rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-white text-xl mb-2">Años</label>
+                <input 
+                  type="number"
+                  placeholder="Años de plazo"
+                  name="years"
+                  value={formData.years}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 bg-white/90 text-xl text-black rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-white text-xl mb-2">Valor de la propiedad</label>
+                <input 
+                  type="number"
+                  placeholder="Valor en Pesos Chilenos"
+                  name="propertyValue"
+                  value={propertyValue}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 bg-white/90 text-xl text-black rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-white text-xl mb-2">Valor Prestamo</label>
+                <input 
+                  type="number"
+                  name="loanAmount"
+                  placeholder="Valor en Pesos Chilenos"
+                  value={formData.loanAmount}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 bg-white/90 text-xl text-black rounded-md"
+                />
+              </div>
+            </div>
+          </div>
+        
+          {/* Sección de Valor Obtenido y Botones */}
+          <div className="flex flex-col items-center translate-y-16">
+            <div className="text-white text-4xl mb-4">{labelValue}</div>
+            <div className="flex justify-center gap-4">
+              <button 
+                type="button" 
+                onClick={handleCalculate}
+                className="px-6 py-2 bg-[#3D2A3B] text-white text-xl rounded-md hover:bg-opacity-90"
+              >
+                Calcular
+              </button>
+              <button 
+                type="submit" 
+                onClick={handleSubmit}
+                className="px-6 py-2 bg-[#3D2A3B] text-white text-xl rounded-md hover:bg-opacity-90"
+              >
+                Ingresar Solicitud
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        {/* Lista de Documentos */}
+        <div className="grid grid-cols-2 gap-6">
           {requirements.map((req, index) => (
-              <li key={index}>
-                  <div className="document-requirement">
-                      <h3>{req}</h3>
-                      <PdfUploader onUpload={(json) => handleDocumentUpload(json, req)} />
-                      {documentsData[req]?.status === 'uploaded' && (
-                          <div className="document-status">
-                              <span className="success">✓ Archivo cargado: {documentsData[req].fileName}</span>
-                          </div>
-                      )}
+            <div key={index} className="bg-[#2a3138] p-6 rounded-lg shadow-lg">
+              <h3 className="text-white text-xl mb-4">{req}</h3>
+              <div className="space-y-2">
+                <PdfUploader onUpload={(json) => handleDocumentUpload(json, req)} />
+                {documentsData[req]?.status === 'uploaded' && (
+                  <div className="text-green-400 text-sm">
+                    ✓ Archivo cargado: {documentsData[req].fileName}
                   </div>
-              </li>
+                )}
+              </div>
+            </div>
           ))}
-      </ul>
+        </div>
+      </div>
     </div>
   );
 };

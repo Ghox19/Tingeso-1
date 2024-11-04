@@ -27,7 +27,7 @@ export function PdfUploader({ onUpload, documentType }) {
 
     return (
         <div>
-            <input type="file" accept="application/pdf" onChange={handleFileChange} required />
+            <input className="text-xs" type="file" accept="application/pdf" onChange={handleFileChange} required />
         </div>
     );
 }
