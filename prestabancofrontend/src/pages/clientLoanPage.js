@@ -5,6 +5,7 @@ import { getApiUrl } from '../enviroment';
 
 export const ClientLoanPage = () => {
   const API_URL = getApiUrl();
+
   const [loans, setLoans] = useState([]);
 
   useEffect(() => {

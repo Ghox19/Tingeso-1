@@ -4,6 +4,7 @@ import { getApiUrl } from '../enviroment';
 
 export function PdfUploader({ onUpload, documentType }) {
     const API_URL = getApiUrl();
+
     const handleFileChange = (event) => {
         handleSubmit(event, event.target.files[0]);
     };

@@ -18,7 +18,7 @@ export const CreditCalculator = () => {
   const [loanName] = useState(location.state.name || '');
   const [propertyValue, setPropertyValue] = useState('');
   const [labelValue, setLabelValue] = useState('Valor obtenido');
-  const [requirements, setRequirements] = useState(location.state.requirements || []);
+  const [requirements] = useState(location.state.requirements || []);
   const [documentsData, setDocumentsData] = useState({});
 
   const handleDocumentUpload = (json, documentType) => {
