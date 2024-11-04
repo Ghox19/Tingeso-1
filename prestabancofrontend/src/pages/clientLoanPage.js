@@ -4,7 +4,7 @@ import { LoanInfo } from '../components/LoanInfo';
 import { getApiUrl } from '../enviroment';
 
 export const ClientLoanPage = () => {
-  API_URL = getApiUrl();
+  const API_URL = getApiUrl();
   const [loans, setLoans] = useState([]);
 
   useEffect(() => {
