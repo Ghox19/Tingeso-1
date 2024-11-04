@@ -1,9 +1,9 @@
 import React from 'react';
 import axios from 'axios';
-
-const API_URL = 'http://104.41.28.230';
+import { getApiUrl } from '../enviroment';
 
 export function PdfUploader({ onUpload, documentType }) {
+    const API_URL = getApiUrl();
     const handleFileChange = (event) => {
         handleSubmit(event, event.target.files[0]);
     };

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { LoanInfo } from '../components/LoanInfo';
-
-const API_URL = 'http://104.41.28.230';
+import { getApiUrl } from '../enviroment';
 
 export const ClientLoanPage = () => {
+  API_URL = getApiUrl();
   const [loans, setLoans] = useState([]);
 
   useEffect(() => {

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-const API_URL = 'http://104.41.28.230';
+import { getApiUrl } from '../enviroment';
 
 export const ClientLoanValidation = () => {
+  const API_URL = getApiUrl();
   const navigate = useNavigate();
   const location = useLocation();
 

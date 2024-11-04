@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { PdfUploader } from '../components/pdfUploader';
-
-const API_URL = 'http://104.41.28.230';
+import { getApiUrl } from '../enviroment';
 
 export const Register = () => {
+  const API_URL = getApiUrl();
   const [formData, setFormData] = useState({
     name: '',
     lastName: '',

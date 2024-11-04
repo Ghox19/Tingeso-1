@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { PdfUploader } from '../components/pdfUploader';
-
-const API_URL = 'http://104.41.28.230';
+import { getApiUrl } from '../enviroment';
 
 export const CreditCalculator = () => {
+  const API_URL = getApiUrl();
   const location = useLocation();
 
   const [formData, setFormData] = useState({
