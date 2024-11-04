@@ -3,7 +3,7 @@ export const environment = {
       API_URL: 'http://localhost:8080'
     },
     production: {
-      API_URL: 'http://104.41.28.230'
+      API_URL: 'http://104.41.28.230:8090'
     }
   };
   
