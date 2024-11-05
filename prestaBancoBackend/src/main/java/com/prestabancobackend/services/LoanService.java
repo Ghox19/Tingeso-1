@@ -21,9 +21,4 @@ public class LoanService {
     public List<LoanEntity> getAllLoans(){
         return this.loanRepository.findAll();
     }
-
-    public LoanEntity getLoanByName(String name){
-        Optional<LoanEntity> optionalLoan = loanRepository.findByName(name);
-        return optionalLoan.orElse(null);
-    }
 }

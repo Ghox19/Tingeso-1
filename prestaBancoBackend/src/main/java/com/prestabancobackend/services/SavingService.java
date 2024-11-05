@@ -76,7 +76,7 @@ public class SavingService {
         return saving;
     }
 
-    private List<String> verifyConditions(SavingEntity saving){
+    List<String> verifyConditions(SavingEntity saving){
         List<String> reasons = new ArrayList<>();
 
         ClientLoanEntity clientLoan = saving.getClientLoan();
@@ -112,7 +112,7 @@ public class SavingService {
         return reasons;
     }
 
-    private boolean verificarHistorialAhorro(Integer[] balances, Integer[] withdraws) {
+    boolean verificarHistorialAhorro(Integer[] balances, Integer[] withdraws) {
         for (int i = 0; i < 12; i++) {
             if (balances[i] <= 0) {
                 return false;
@@ -124,7 +124,7 @@ public class SavingService {
         return true;
     }
 
-    private boolean verificarDepositosPeriodicos(List<Integer> deposits, Integer ingresosMensuales) {
+    boolean verificarDepositosPeriodicos(List<Integer> deposits, Integer ingresosMensuales) {
         int mesesSinDeposito = 0;
         int mesesConsecutivosSinDeposito = 0;
         double minimoMensual = ingresosMensuales * 0.05;

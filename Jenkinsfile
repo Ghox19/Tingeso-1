@@ -42,6 +42,18 @@ pipeline {
             }
         }
 
+        stage('Test backend') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'cd Backend && mvn test'
+                    } else {
+                        bat 'cd Backend && mvn test'
+                    }
+                }
+            }
+        }
+
         stage('Build frontend') {
             steps {
                 script {

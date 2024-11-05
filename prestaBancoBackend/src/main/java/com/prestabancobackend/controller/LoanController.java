@@ -23,9 +23,4 @@ public class LoanController {
 
     @GetMapping
     public List<LoanEntity> getAllLoans() { return this.loanService.getAllLoans();}
-
-    @GetMapping("/{name}")
-    public LoanEntity getLoanByName(@PathVariable String name) {  return this.loanService.getLoanByName(name);}
-
-
 }

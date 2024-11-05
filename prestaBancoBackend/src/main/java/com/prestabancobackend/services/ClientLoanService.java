@@ -153,12 +153,6 @@ public class ClientLoanService {
         }
     }
 
-    public ClientLoanEntity getClientLoanbyIdRaw(Long id){
-        Optional<ClientLoanEntity> clientLoan = clientLoanRepository.findById(id);
-
-        return clientLoan.orElse(null);
-    }
-
     public List<ClientLoanGetForm> getAllClientLoan() {
         List<ClientLoanEntity> clientLoans = this.clientLoanRepository.findAll();
 

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { PdfUploader } from '../components/pdfUploader';
 import { getApiUrl } from '../enviroment';
+import  Slider  from '../components/slider';
 
 export const CreditCalculator = () => {
   const API_URL = getApiUrl();
@@ -18,6 +19,8 @@ export const CreditCalculator = () => {
   const [loanName] = useState(location.state.name || '');
   const [propertyValue, setPropertyValue] = useState('');
   const [labelValue, setLabelValue] = useState('Valor obtenido');
+  const [maxInterest] = useState(location.state.maxInterest || 0); 
+  const [minInterest] = useState(location.state.minInterest || 0); 
   const [requirements] = useState(location.state.requirements || []);
   const [documentsData, setDocumentsData] = useState({});
 
@@ -221,7 +224,9 @@ export const CreditCalculator = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 bg-white/90 text-xl text-black rounded-md"
                 />
+                <Slider min={minInterest} max={maxInterest} value={formData.interest} onChange={handleInputChange} />
               </div>
+
               <div>
                 <label className="block text-white text-xl mb-2">Años</label>
                 <input 
