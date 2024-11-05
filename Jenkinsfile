@@ -46,9 +46,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'cd Backend && mvn test'
+                        sh 'cd prestaBancoBackend && mvn test'
                     } else {
-                        bat 'cd Backend && mvn test'
+                        bat 'cd prestaBancoBackend && mvn test'
                     }
                 }
             }
