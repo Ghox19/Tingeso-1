@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { PdfUploader } from '../components/pdfUploader';
 import { getApiUrl } from '../enviroment';
+import { useNavigate } from 'react-router-dom';
 
 export const Register = () => {
   const API_URL = getApiUrl();
+  const navigate = useNavigate();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -52,11 +55,13 @@ export const Register = () => {
     };
     
     try {
-      console.log('Data to send:', dataToSend);
       const response = await axios.post(`${API_URL}/client`, dataToSend, {
         headers: { 'Content-Type': 'application/json' }
       });
-      console.log('Client registered successfully:', response.data);
+      setShowSuccess(true);
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
     } catch (error) {
       console.error('Error registering client:', error);
     }
@@ -68,10 +73,16 @@ export const Register = () => {
         <h1 className="text-3xl font-bold text-white text-center mb-8">
           Registro de Usuario
         </h1>
-        
+        <div className="relative">
+          {showSuccess && (
+            <div className="fixed top-4 right-4 bg-green-700 text-white px-6 py-3 text-lg rounded-md shadow-lg transition-all duration-500 ease-in-out transform animate-fade-in-down">
+              ¡Registrado correctamente!
+            </div>
+          )}
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information Section */}
-          <div className="bg-[#2A353D] p-6 rounded-lg space-y-4">
+          <div className="bg-[#232E37] p-6 rounded-lg space-y-4">
             <h2 className="text-xl font-semibold text-white mb-4">
               Información Personal
             </h2>
@@ -170,7 +181,7 @@ export const Register = () => {
           </div>
 
           {/* Financial Information Section */}
-          <div className="bg-[#2A353D] p-6 rounded-lg space-y-4">
+          <div className="bg-[#232E37] p-6 rounded-lg space-y-4">
             <h2 className="text-xl font-semibold text-white mb-4">
               Información Financiera
             </h2>
@@ -242,7 +253,7 @@ export const Register = () => {
           </div>
 
           {/* Documents Section */}
-          <div className="bg-[#2A353D] p-6 rounded-lg space-y-4">
+          <div className="bg-[#232E37] p-6 rounded-lg space-y-4">
             <h2 className="text-xl font-semibold text-white mb-4">
               Documentos Requeridos
             </h2>
@@ -298,6 +309,7 @@ export const Register = () => {
               Registrarse
             </button>
           </div>
+
         </form>
       </div>
     </div>

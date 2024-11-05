@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay, rut}) => {
+export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay, rut, fase}) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -14,7 +14,7 @@ export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay, 
   , []);
   return (
     <div className="max-w-6xl mx-auto bg-[#2A353D] rounded-xl shadow-md overflow-hidden p-4">
-      <ul className="grid grid-cols-7 gap-2">
+      <ul className="grid grid-cols-8 gap-2">
         <li className="border-r border-[#29394D] pr-2">
           <span className="font-semibold text-white text-sm">{loanName}</span>
         </li>
@@ -30,10 +30,13 @@ export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay, 
         <li className="border-r border-[#29394D] pr-2">
           <span className="font-semibold text-white text-sm">${mensualPay}</span>
         </li>
-        <li>
+        <li className="border-r border-[#29394D] pr-2">
           <span className="font-semibold text-white text-sm">{rut}</span>
+        </li >
+        <li className="border-r border-[#29394D] pr-2">
+          <span className="font-semibold text-white text-sm">{fase}</span>
         </li>
-        <li>
+        <li className="border-r border-[#29394D] pr-2">
           <button 
             onClick={handleClick}
             className="w-full bg-blue-600 text-white text-sm py-1 px-3 rounded-lg hover:bg-blue-700 transition duration-300"

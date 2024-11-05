@@ -18,7 +18,6 @@ export function PdfUploader({ onUpload, documentType }) {
             const response = await axios.post(`${API_URL}/document/jsonConvert`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            console.log('Documento subido:', response.data);  
             onUpload(response.data, documentType); // Pass JSON data to parent component
         } catch (error) {
             console.error('Error al subir el documento!');

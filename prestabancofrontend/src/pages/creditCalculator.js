@@ -165,11 +165,12 @@ export const CreditCalculator = () => {
     const submitData = {
         rut: rut,
         loanName: loanName,
+        propertyValue: propertyValue,
         years: formData.years,
         interest: formData.interest,
         loanAmount: formData.loanAmount,
         mensualPay: mensualPay,
-        fase: 'En Evaluacion',
+        fase: 'En Revision Inicial',
         documents: documents
     };
 

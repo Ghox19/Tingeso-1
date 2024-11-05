@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface LoanRepository extends JpaRepository<LoanEntity, Long> {
-    Optional<LoanEntity> findByName(String name);
+    LoanEntity findByName(String name);
 }

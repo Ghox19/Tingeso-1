@@ -62,4 +62,16 @@ public class DocumentController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DocumentEntity> updateDocument(
+            @PathVariable Long id,
+            @RequestBody DocumentForm documentForm) {
+        try {
+            DocumentEntity updatedDocument = documentService.updateDocument(id, documentForm);
+            return new ResponseEntity<>(updatedDocument, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

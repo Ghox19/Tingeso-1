@@ -3,6 +3,7 @@ package com.prestabancobackend.services;
 import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.entities.DocumentEntity;
+import com.prestabancobackend.entities.LoanEntity;
 import com.prestabancobackend.form.*;
 import com.prestabancobackend.getForms.ClientLoanGetForm;
 import com.prestabancobackend.getForms.DocumentSaveForm;
@@ -29,11 +30,14 @@ public class ClientLoanService {
     private final ClientRepository clientRepository;
     private final DocumentService documentService;
 
+    private final LoanService loanService;
+
     @Autowired
-    public ClientLoanService(ClientLoanRepository clientLoanRepository, ClientRepository clientRepository, DocumentService documentService) {
+    public ClientLoanService(ClientLoanRepository clientLoanRepository, ClientRepository clientRepository, DocumentService documentService, LoanService loanService) {
         this.clientLoanRepository = clientLoanRepository;
         this.clientRepository = clientRepository;
         this.documentService = documentService;
+        this.loanService = loanService;
     }
 
     public ResponseEntity<Object> addClientLoan(ClientLoanForm clientLoanForm) {
@@ -62,6 +66,25 @@ public class ClientLoanService {
                     .body("Falta calcular el valor de la cuota mensual");
         }
 
+        LoanEntity loantype = loanService.getLoanByName(clientLoanForm.getLoanName());
+        if (clientLoanForm.getInterest() < loantype.getMinInterest() || clientLoanForm.getInterest() > loantype.getMaxInterest()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("El Interes del prestamo esta fuera de los limites");
+        }
+
+        if (clientLoanForm.getYears() > loantype.getMaxYears()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Los años del prestamo esta fuera de los limites");
+        }
+
+        float loanRatio = (float) (clientLoanForm.getLoanAmount() * 100) / clientLoanForm.getPropertyValue();
+        if (loanRatio > loantype.getMaxAmount()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("La cantidad del prestamo esta fuera de los limites");
+        }
         // Check monthly payment to income ratio
         double cuotaIncome = (mensualPay / client.getMensualIncome()) * 100;
         if (cuotaIncome > 35) {
@@ -86,6 +109,7 @@ public class ClientLoanService {
                     .body("La deuda total excede el 50% del sueldo mensual");
         }
 
+
         // Validate age limit
         int totalYears = client.getYears() + clientLoanForm.getYears();
         if (totalYears > 70) {
@@ -95,7 +119,7 @@ public class ClientLoanService {
         }
 
 
-        ClientLoanEntity clientLoan = createAndSaveClientLoan(clientLoanForm, client);
+        ClientLoanEntity clientLoan = createAndSaveClientLoan(clientLoanForm, client, cuotaIncome, debtCuota, loanRatio);
         List<DocumentEntity> documents = processDocuments(clientLoanForm.getDocuments(), clientLoan);
 
         updateClientWithLoan(client, clientLoan, documents);
@@ -105,10 +129,13 @@ public class ClientLoanService {
                 .body("Se ingresó correctamente el préstamo del cliente");
     }
 
-    private ClientLoanEntity createAndSaveClientLoan(ClientLoanForm form, ClientEntity client) {
+    private ClientLoanEntity createAndSaveClientLoan(ClientLoanForm form, ClientEntity client,Double cuotaIncome,Double debtCuota,Float loanRatio) {
         ClientLoanEntity clientLoan = new ClientLoanEntity();
         clientLoan.setClient(client);
         setClientLoanFields(clientLoan, form);
+        clientLoan.setCuotaIncome(cuotaIncome);
+        clientLoan.setDebtCuota(debtCuota);
+        clientLoan.setLoanRatio(loanRatio);
         return this.clientLoanRepository.save(clientLoan);
     }
 
@@ -119,6 +146,7 @@ public class ClientLoanService {
         clientLoan.setYears(form.getYears());
         clientLoan.setMensualPay(form.getMensualPay());
         clientLoan.setFase(form.getFase());
+        clientLoan.setPropertyValue(form.getPropertyValue());
     }
 
     private List<DocumentEntity> processDocuments(List<DocumentForm> documentForms, ClientLoanEntity clientLoan) {
@@ -136,11 +164,6 @@ public class ClientLoanService {
         clientLoan.setDocuments(documents);
         client.getLoans().add(clientLoan);
         this.clientRepository.save(client);
-    }
-
-    public List<ClientLoanEntity> getClientLoanByClient(Long id) {
-        Optional<ClientEntity> optionalClient = clientRepository.findById(id);
-        return optionalClient.map(clientLoanRepository::findByClient).orElse(null);
     }
 
     public ClientLoanGetForm getClientLoanById(Long id) {
@@ -172,6 +195,11 @@ public class ClientLoanService {
         clientLoanGetForm.setFase(clientLoan.getFase());
         clientLoanGetForm.setClient(clientLoan.getClient());
         clientLoanGetForm.setSavings(clientLoan.getSaving());
+        clientLoanGetForm.setPropertyValue(clientLoan.getPropertyValue());
+        clientLoanGetForm.setCuotaIncome(clientLoan.getCuotaIncome());
+        clientLoanGetForm.setDebtCuota(clientLoan.getDebtCuota());
+        clientLoanGetForm.setMessage(clientLoan.getMessage());
+        clientLoanGetForm.setLoanRatio(clientLoan.getLoanRatio());
 
         List<DocumentSaveForm> documentForms = clientLoan.getDocuments()
                 .stream()

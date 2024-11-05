@@ -57,4 +57,22 @@ public class DocumentService {
         documentSaveForm.setApproved(document.getApproved());
         return documentSaveForm;
     }
+
+    public DocumentEntity updateDocument(Long id, DocumentForm documentForm) {
+        DocumentEntity existingDocument = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Document not found with id: " + id));
+
+        existingDocument.setName(documentForm.getName());
+
+        // Update content only if new content is provided
+        if (documentForm.getContent() != null) {
+            byte[] contentBytes = Base64.getDecoder().decode(documentForm.getContent());
+            existingDocument.setContent(contentBytes);
+        }
+
+        existingDocument.setType(documentForm.getType());
+        existingDocument.setApproved(documentForm.getApproved());
+
+        return documentRepository.save(existingDocument);
+    }
 }

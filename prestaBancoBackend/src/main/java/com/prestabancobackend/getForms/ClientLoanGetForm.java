@@ -13,9 +13,14 @@ public class ClientLoanGetForm {
     private String loanName;
     private Integer years;
     private Float interest;
+    private Integer propertyValue;
     private Integer loanAmount;
+    private Float loanRatio;
     private Integer mensualPay;
     private String fase;
+    private String message;
+    private Double cuotaIncome;
+    private Double debtCuota;
     private ClientEntity client;
 
     private SavingEntity savings;

@@ -1,6 +1,5 @@
 package com.prestabancobackend.controller;
 
-import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.form.CalculatorForm;
 import com.prestabancobackend.form.ClientLoanForm;
 import com.prestabancobackend.getForms.ClientLoanGetForm;
@@ -29,11 +28,6 @@ public class ClientLoanController {
     @GetMapping("/{id}")
     public ClientLoanGetForm getClientLoansById(@PathVariable Long id) {
         return this.clientLoanService.getClientLoanById(id);
-    }
-
-    @GetMapping("/client/{id}")
-    public List<ClientLoanEntity> getClientLoansByClient(@PathVariable Long id) {
-        return this.clientLoanService.getClientLoanByClient(id);
     }
 
     @GetMapping

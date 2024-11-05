@@ -22,10 +22,15 @@ public class ClientLoanEntity {
 
     private String loanName;
     private Integer years;
+    private Integer propertyValue;
     private Float interest;
     private Integer loanAmount;
+    private Float loanRatio;
     private Integer mensualPay;
     private String fase;
+    private String message;
+    private Double cuotaIncome;
+    private Double debtCuota;
 
     @OneToOne(mappedBy = "clientLoan")
     @JsonManagedReference
