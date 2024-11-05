@@ -4,7 +4,6 @@ import com.prestabancobackend.entities.DocumentEntity;
 import com.prestabancobackend.form.DocumentForm;
 import com.prestabancobackend.getForms.DocumentSaveForm;
 import com.prestabancobackend.repositories.DocumentRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +34,6 @@ class DocumentServiceTest {
     private DocumentEntity document1;
     private DocumentForm documentForm;
     private MultipartFile multipartFile;
-    private DocumentSaveForm documentSaveForm;
 
     @BeforeEach
     void setUp() {

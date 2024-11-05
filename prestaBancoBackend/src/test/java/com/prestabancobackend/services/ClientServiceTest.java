@@ -43,7 +43,6 @@ class ClientServiceTest {
     private ClientEntity clientEntity;
     private DocumentForm documentForm;
     private DocumentEntity documentEntity;
-    private ClientGetForm clientGetForm;
 
     @BeforeEach
     void setUp() {
