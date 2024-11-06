@@ -12,6 +12,8 @@ export const ClientLoanValidation = () => {
   const [loan, setLoan] = useState([]);
   const [client, setClient] = useState([]);
   const [clientDocuments, setClientDocuments] = useState([]);
+  const [idSaving, setIdSaving] = useState(0);
+  const [saving, setSaving] = useState([]);
 
   const fetchLoan = async () => {
     try {
@@ -19,6 +21,10 @@ export const ClientLoanValidation = () => {
       setLoan(response.data);
       setClient(response.data.client);
       fetchClientDocuments(response.data.client.id);
+      if (response.data.savings !== null) {
+        setSaving(response.data.savings);
+        setIdSaving(response.data.savings.id);
+      }
     } catch (error) {
       console.error('Error fetching loans:', error);
     }
@@ -60,7 +66,7 @@ export const ClientLoanValidation = () => {
   };
   
   const handleSavings = async () => {
-    navigate('/savingValidation', { state: {id}});
+    navigate('/savingValidation', { state: {id, idSaving} });
   };
 
   const handleDocumentError = async () => {
@@ -79,6 +85,7 @@ export const ClientLoanValidation = () => {
 
   useEffect(() => {
     fetchLoan();
+    console.log(loan);
   }, []);
 
   return (
@@ -131,7 +138,21 @@ export const ClientLoanValidation = () => {
                 </button>
             </li>
         ))}
-        <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
+        <div className="relative">
+          {loan.savings === null &&(
+            <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
+          )}
+        </div>
+        <div className="relative">
+          {saving.result === "Revision Adicional" &&(
+            <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
+          )}
+        </div>
+        <div className="relative">
+          {loan.savings !== null && saving.result !== "Revision Adicional" &&(
+            <li>La cuenta de Ahorros esta {saving.result}</li>
+          )}
+        </div>
         <div className="relative">
           {loan.fase === "En Revision Inicial" && (
              <button onClick={() => handleDocumentError()}>Error en los Archivos</button>

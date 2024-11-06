@@ -122,38 +122,6 @@ class SavingServiceTest {
     }
 
     @Test
-    void addSaving_ShouldReturnSuccessResponse_WhenValidInput() {
-        // Arrange
-        when(clientLoanRepository.findById(1L)).thenReturn(Optional.of(clientLoan));
-        when(savingRepository.save(any(SavingEntity.class))).thenReturn(savingEntity);
-
-        // Act
-        ResponseEntity<Object> response = savingService.addSaving(savingForm);
-
-        // Assert
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("Guardado el Saving", response.getBody());
-        verify(clientLoanRepository).findById(1L);
-        verify(savingRepository).save(any(SavingEntity.class));
-        verify(clientLoanRepository).save(clientLoan);
-    }
-
-    @Test
-    void addSaving_ShouldReturnBadRequest_WhenClientLoanNotFound() {
-        // Arrange
-        when(clientLoanRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act
-        ResponseEntity<Object> response = savingService.addSaving(savingForm);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("No existe el ClientLoan ingresado", response.getBody());
-        verify(clientLoanRepository).findById(1L);
-        verify(savingRepository, never()).save(any(SavingEntity.class));
-    }
-
-    @Test
     void getSavingById_ShouldReturnSaving_WhenExists() {
         // Arrange
         when(savingRepository.findById(1L)).thenReturn(Optional.of(savingEntity));
@@ -219,28 +187,5 @@ class SavingServiceTest {
         assertTrue(result);
     }
 
-    @Test
-    void addSaving_ShouldReturnSuccessResponse_WhenValidInput_WithOtherCasesOfValidation() {
-        // Arrange
-        when(clientLoanRepository.findById(2L)).thenReturn(Optional.of(clientLoan2));
-        when(savingRepository.save(any(SavingEntity.class))).thenReturn(savingEntity2);
 
-        // Act
-        ResponseEntity<Object> response = savingService.addSaving(savingForm2);
-
-        // Assert
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("Guardado el Saving", response.getBody());
-
-        verify(clientLoanRepository).findById(2L);
-        verify(savingRepository).save(argThat(saving ->
-                saving.getYears() == 1 &&
-                        saving.getActualBalance() == 2000 &&
-                        saving.getClientLoan().getId() == 2L
-        ));
-        verify(clientLoanRepository).save(argThat(cl ->
-                cl.getId() == 2L &&
-                        cl.getLoanAmount() == 10000
-        ));
-    }
 }

@@ -2,6 +2,7 @@ package com.prestabancobackend.controller;
 
 import com.prestabancobackend.form.CalculatorForm;
 import com.prestabancobackend.form.ClientLoanForm;
+import com.prestabancobackend.form.ClientLoanPreApprovedForm;
 import com.prestabancobackend.getForms.ClientLoanGetForm;
 import com.prestabancobackend.services.ClientLoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +39,10 @@ public class ClientLoanController {
     @PostMapping("/calculator")
     public Integer getMonthlyPay(@RequestBody CalculatorForm calculatorForm) {
         return this.clientLoanService.calculateMensualPay(calculatorForm);
+    }
+
+    @PutMapping("/preApproved")
+    public ResponseEntity<Object> updateClientLoanPreApproved(@RequestBody ClientLoanPreApprovedForm form) {
+        return this.clientLoanService.updateClientLoanPreApproved(form);
     }
 }

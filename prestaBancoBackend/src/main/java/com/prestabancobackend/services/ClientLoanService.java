@@ -85,6 +85,12 @@ public class ClientLoanService {
                     .badRequest()
                     .body("La cantidad del prestamo esta fuera de los limites");
         }
+
+        if (clientLoanForm.getDocuments().size() < loantype.getRequirements().size()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Faltan Documentos");
+        }
         // Check monthly payment to income ratio
         double cuotaIncome = (mensualPay / client.getMensualIncome()) * 100;
         if (cuotaIncome > 35) {
@@ -126,7 +132,7 @@ public class ClientLoanService {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body("Se ingresó correctamente el préstamo del cliente");
+                .body("Se ingresó correctamente el préstamo");
     }
 
     private ClientLoanEntity createAndSaveClientLoan(ClientLoanForm form, ClientEntity client,Double cuotaIncome,Double debtCuota,Float loanRatio) {
@@ -200,6 +206,9 @@ public class ClientLoanService {
         clientLoanGetForm.setDebtCuota(clientLoan.getDebtCuota());
         clientLoanGetForm.setMessage(clientLoan.getMessage());
         clientLoanGetForm.setLoanRatio(clientLoan.getLoanRatio());
+        clientLoanGetForm.setFireInsurance(clientLoan.getFireInsurance());
+        clientLoanGetForm.setDeduction(clientLoan.getDeduction());
+        clientLoanGetForm.setTotalCost(clientLoan.getTotalCost());
 
         List<DocumentSaveForm> documentForms = clientLoan.getDocuments()
                 .stream()
@@ -209,6 +218,35 @@ public class ClientLoanService {
         clientLoanGetForm.setDocuments(documentForms);
 
         return clientLoanGetForm;
+    }
+
+    public ResponseEntity<Object> updateClientLoanPreApproved(ClientLoanPreApprovedForm form){
+        Optional<ClientLoanEntity> clientLoanOp = clientLoanRepository.findById(form.getClientLoanId());
+
+        if (clientLoanOp.isEmpty()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("No se encontro la Solicitud");
+        }
+
+        ClientLoanEntity clientLoan = clientLoanOp.get();
+
+        double deductionAmount = clientLoan.getLoanAmount() * form.getDeduction();
+        double commission = clientLoan.getLoanAmount() * 0.01;
+        int newMensualPay = (int) (clientLoan.getMensualPay() + deductionAmount + commission);
+        clientLoan.setMensualPay(newMensualPay);
+        clientLoan.setDeduction(form.getDeduction());
+        clientLoan.setFireInsurance(form.getFireInsurance());
+
+        int totalMonths = clientLoan.getYears() * 12;
+        int totalCost = (int) ((totalMonths * newMensualPay) + commission);
+        clientLoan.setTotalCost(totalCost);
+        clientLoan.setFase("Pre-Aprobada");
+        clientLoanRepository.save(clientLoan);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Se PreAprobo Correctamente el Prestamo");
     }
 
     public Integer calculateMensualPay (CalculatorForm calculatorForm){

@@ -19,6 +19,7 @@ export const CreditCalculator = () => {
   const [loanName] = useState(location.state.name || '');
   const [propertyValue, setPropertyValue] = useState('');
   const [labelValue, setLabelValue] = useState('Valor obtenido');
+  const [reason, setReason] = useState('')
   const [maxInterest] = useState(location.state.maxInterest || 0); 
   const [minInterest] = useState(location.state.minInterest || 0); 
   const [requirements] = useState(location.state.requirements || []);
@@ -179,9 +180,10 @@ export const CreditCalculator = () => {
       const response = await axios.post(`${API_URL}/clientLoan`, submitData, {
         headers: { 'Content-Type': 'application/json' }
       });
-      console.log('clienLoan registered successfully:', response.data);
+      setReason(response.data);
     } catch (error) {
-      console.error('Error registering clientLoan:', error);
+      setReason(error.response.data)
+      
     }
   };
 
@@ -301,6 +303,11 @@ export const CreditCalculator = () => {
               </div>
             </div>
           ))}
+        </div>
+        <div className="relative">
+          {reason != "" && (
+             <div>{reason}</div>
+          )}
         </div>
       </div>
     </div>

@@ -31,6 +31,9 @@ public class ClientLoanEntity {
     private String message;
     private Double cuotaIncome;
     private Double debtCuota;
+    private Integer fireInsurance;
+    private Double deduction;
+    private Integer totalCost;
 
     @OneToOne(mappedBy = "clientLoan")
     @JsonManagedReference

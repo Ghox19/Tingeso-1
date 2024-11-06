@@ -3,6 +3,7 @@ package com.prestabancobackend.services;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.entities.SavingEntity;
 import com.prestabancobackend.form.SavingForm;
+import com.prestabancobackend.form.SavingResultForm;
 import com.prestabancobackend.getForms.ClientLoanGetForm;
 import com.prestabancobackend.getForms.SavingGetForm;
 import com.prestabancobackend.repositories.ClientLoanRepository;
@@ -31,13 +32,11 @@ public class SavingService {
         this.clientLoanService = clientLoanService;
     }
 
-    public ResponseEntity<Object> addSaving(SavingForm savingForm){
+    public Long addSaving(SavingForm savingForm){
         Optional<ClientLoanEntity> optionalClientLoan = this.clientLoanRepository.findById(savingForm.getClientLoanId());
 
         if (optionalClientLoan.isEmpty()){
-            return ResponseEntity
-                    .badRequest()
-                    .body("No existe el ClientLoan ingresado");
+            return null;
         }
 
         ClientLoanEntity clientLoan = optionalClientLoan.get();
@@ -48,10 +47,12 @@ public class SavingService {
         int count = reasons.size();
         if (count > 3){
             savingEntity.setResult("Rechazado");
+            clientLoan.setFase("Rechazado");
+            clientLoan.setMessage("El Prestamo fue Rechazado por no cumplir correctamente con la Cuenta de Ahorros");
         } else if (count < 3 && count >= 1){
             savingEntity.setResult("Revision Adicional");
         } else {
-            savingEntity.setResult("Aprovado");
+            savingEntity.setResult("Aprobado");
         }
 
         this.savingRepository.save(savingEntity);
@@ -60,9 +61,7 @@ public class SavingService {
 
         this.clientLoanRepository.save(clientLoan);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body("Guardado el Saving");
+        return savingEntity.getId();
     }
 
     private SavingEntity createSavingFromForm(SavingForm form, ClientLoanEntity clientLoan) {
@@ -125,14 +124,12 @@ public class SavingService {
     }
 
     boolean verificarDepositosPeriodicos(List<Integer> deposits, Integer ingresosMensuales) {
-        int mesesSinDeposito = 0;
         int mesesConsecutivosSinDeposito = 0;
         double minimoMensual = ingresosMensuales * 0.05;
 
         // Recorremos los últimos 12 meses
         for (Integer deposito : deposits) {
             if (deposito < minimoMensual) {
-                mesesSinDeposito++;
                 mesesConsecutivosSinDeposito++;
 
                 // Si hay más de 3 meses consecutivos sin depósito, falla inmediatamente
@@ -146,7 +143,7 @@ public class SavingService {
         }
 
         // Verifica que no haya más de 3 meses en total sin depósitos
-        return mesesSinDeposito <= 3;
+        return true;
     }
 
     private boolean verificarRetirosRecientes(Integer[] withdraws, Integer actualBalance) {
@@ -181,6 +178,35 @@ public class SavingService {
             return setSavingGetForm(savingEntity.get());
         } else {
             throw new EntityNotFoundException("Saving not found with id: " + id);
+        }
+    }
+
+    public ResponseEntity<Object>  updateStateSaving(SavingResultForm form){
+        Optional<SavingEntity> savingEntity = savingRepository.findById(form.getId());
+
+        if(savingEntity.isPresent()){
+            if(form.getResult() == "Aprobado"){
+                savingEntity.get().setResult(form.getResult());
+                savingRepository.save(savingEntity.get());
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body("Se Aprobo correctamente la cuenta");
+            } else {
+                savingEntity.get().setResult(form.getResult());
+                savingRepository.save(savingEntity.get());
+                ClientLoanEntity clientLoan = savingEntity.get().getClientLoan();
+                clientLoan.setFase("Rechazado");
+                clientLoan.setMessage("El Prestamo fue Rechazado por no cumplir correctamente con la Cuenta de Ahorros");
+                clientLoanRepository.save(clientLoan);
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body("Se Rechazo correctamente la cuenta");
+            }
+
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .body("No se encontro la Cuenta de Ahorros");
         }
     }
 }
