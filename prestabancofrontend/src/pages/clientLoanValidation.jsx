@@ -15,6 +15,19 @@ export const ClientLoanValidation = () => {
   const [idSaving, setIdSaving] = useState(0);
   const [saving, setSaving] = useState([]);
 
+  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
+  const [fireInsurance, setFireInsurance] = useState('');
+  const [deduction, setDeduction] = useState('');
+
+  // Añade esta función para verificar si todos los documentos están aprobados
+  const areAllDocumentsApproved = () => {
+    const areClientDocsApproved = clientDocuments.every(doc => doc.approved);
+    const areLoanDocsApproved = loan.documents?.every(doc => doc.approved);
+    const isSavingApproved = saving.result === "Aprobado";
+    
+    return areClientDocsApproved && areLoanDocsApproved && isSavingApproved;
+  };
+
   const fetchLoan = async () => {
     try {
       const response = await axios.get(`${API_URL}/clientLoan/${id}`);
@@ -83,10 +96,27 @@ export const ClientLoanValidation = () => {
     }
   };
 
+  const handleApprove = async () => {
+    const newLoan = {
+      clientLoanId: loan.id,
+      fireInsurance: fireInsurance,
+      deduction: deduction
+    };
+    try {
+      const response = await axios.put(`${API_URL}/clientLoan/preApproved`, newLoan);
+      fetchLoan();
+    } catch (error) {
+      console.error('Error approving the loan', error);
+    }
+  }
+
   useEffect(() => {
     fetchLoan();
-    console.log(loan);
   }, []);
+
+  useEffect(() => {
+    setShowAdditionalFields(areAllDocumentsApproved());
+  }, [clientDocuments, loan.documents, saving]);
 
   return (
     <div>
@@ -116,6 +146,34 @@ export const ClientLoanValidation = () => {
                 </button>
             </li>
         ))}
+        {showAdditionalFields && loan.fase === "Revision Inicial"&&(
+          <div className="additional-fields">
+            <h3>Para Aprobar debe rellenar estos campos</h3>
+            <div className="field-container">
+              <label htmlFor="fireInsurance">Seguro de Incendios:</label>
+              <input
+                type="number"
+                id="fireInsurance"
+                value={fireInsurance}
+                onChange={(e) => setFireInsurance(e.target.value)}
+                className="form-control text-black"
+                required
+              />
+            </div>
+            <div className="field-container">
+              <label htmlFor="deduction">Porcentaje de seguro de Desgravamen:</label>
+              <input
+                type="number"
+                id="deduction"
+                value={deduction}
+                onChange={(e) => setDeduction(e.target.value)}
+                className="form-contro text-black"
+                required
+              />
+            </div>
+            <button onClick={handleApprove}>Aprobar</button>
+          </div>
+        )}
         <h3>Informacion cliente</h3>
         <li><strong>RUT:</strong> {client.rut}</li>
         <li><strong>Nombre:</strong> {client.name + " " +client.lastName}</li>

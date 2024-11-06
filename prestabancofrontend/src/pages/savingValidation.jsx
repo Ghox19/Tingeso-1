@@ -188,14 +188,21 @@ export const SavingValidation = () => {
             </table>
           </div>
           <div className="flex items-center gap-4 mt-4">
-            <button
-              type="submit"
-              className="w-full md:w-auto px-6 py-2.5 bg-[#2F3429] hover:bg-[#2F3429]/80 
-                        text-white text-xl font-medium rounded-lg transition-colors duration-200 
-                        focus:outline-none focus:ring-2 focus:ring-[#2F3429]/50"
-            >
-              Guardar Datos
-            </button>
+            <div className='relative'>
+              {actualIdSaving === 0 && (
+                <button
+                  type="submit"
+                  className="w-full md:w-auto px-6 py-2.5 bg-[#2F3429] hover:bg-[#2F3429]/80 
+                            text-white text-xl font-medium rounded-lg transition-colors duration-200 
+                            focus:outline-none focus:ring-2 focus:ring-[#2F3429]/50"
+                            Guardar Datos
+                            
+                >
+                  Guardar Datos
+                </button>
+              )}
+            </div>
+             
             <div className='relative'>
               {formData.result === "Revision Adicional" && (
                 <button className='w-full md:w-auto px-6 py-2.5 bg-[#2F3429] hover:bg-[#2F3429]/80 
