@@ -217,6 +217,11 @@ export const Register = () => {
                   <option value="empresa">Empresa</option>
                   <option value="independiente">Independiente</option>
                 </select>
+                {formData.jobType === 'independiente' && (
+                  <p className="mt-2 text-sm text-white italic">
+                    *Debe entregar ingresos de sus últimos 2 años
+                  </p>
+                )}
               </div>
 
               <div>
