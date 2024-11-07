@@ -8,10 +8,6 @@ export const LoanInfo = ({id,loanName, years, interest, loanAmount, mensualPay, 
     navigate('/loanValidation', { state: {id}});
   };
 
-  useEffect(() => {
-    console.log(id);
-  }
-  , []);
   return (
     <div className="max-w-6xl mx-auto bg-[#2A353D] rounded-xl shadow-md overflow-hidden p-2">
       <ul className="grid grid-cols-8 gap-4">

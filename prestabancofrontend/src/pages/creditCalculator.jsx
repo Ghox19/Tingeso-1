@@ -249,7 +249,7 @@ export const CreditCalculator = () => {
           ))}
         </div>
         <div className="relative">
-          {reason != "" && (
+          {reason !== "" && (
              <div>{reason}</div>
           )}
         </div>

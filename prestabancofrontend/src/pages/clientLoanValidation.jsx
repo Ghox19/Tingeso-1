@@ -19,13 +19,14 @@ export const ClientLoanValidation = () => {
     const [rejectMessage, setRejectMessage] = useState('');
 
     const areAllDocumentsApproved = () => {
-        const areClientDocsApproved = clientDocuments.every(doc => doc.approved);
-        const areLoanDocsApproved = loan.documents?.every(doc => doc.approved);
-        const isSavingApproved = saving.result === "Aprobado";
-        return areClientDocsApproved && areLoanDocsApproved && isSavingApproved;
+      const areClientDocsApproved = clientDocuments.every(doc => doc.approved);
+      const areLoanDocsApproved = loan.documents?.every(doc => doc.approved);
+      const isSavingApproved = saving.result === "Aprobado";
+      return areClientDocsApproved && areLoanDocsApproved && isSavingApproved;
     };
 
-    const fetchLoan = async () => {
+    const fetchLoan = async (e) => {
+      e.preventDefault();
         try {
             const loanData = await ClientLoanValidationService.getClientLoanById(id);
             setLoan(loanData);
@@ -42,42 +43,39 @@ export const ClientLoanValidation = () => {
     };
 
     const handleDownload = async (id, name) => {
-        await ClientLoanValidationService.downloadDocument(id, name);
+      await ClientLoanValidationService.downloadDocument(id, name);
     };
 
     const handleSavings = () => {
-        navigate('/savingValidation', { state: {id, idSaving} });
-    };
-
-    const handleDocumentError = () => {
-        navigate('/');
+      navigate('/savingValidation', { state: {id, idSaving} });
     };
 
     const handleDocumentApproved = async (id, document) => {
-        await ClientLoanValidationService.approveDocument(id, document);
-        fetchLoan();
+      await ClientLoanValidationService.approveDocument(id, document);
+      fetchLoan();
     };
 
     const handleReject = async (e) => {
-        e.preventDefault();
-        await ClientLoanValidationService.rejectLoan(id, rejectMessage);
-        setShowMessage(false);
-        fetchLoan();
+      e.preventDefault();
+      await ClientLoanValidationService.rejectLoan(id, rejectMessage);
+      setShowMessage(false);
+      fetchLoan();
     };
 
     const handleClientApproved = async (e) => {
-        e.preventDefault();
-        await ClientLoanValidationService.finalizeClientLoan(id, "Desembolso");
-        fetchLoan();
+      e.preventDefault();
+      await ClientLoanValidationService.finalizeClientLoan(id, "Desembolso");
+      fetchLoan();
     };
 
     const handleClientReject = async (e) => {
-        e.preventDefault();
-        await ClientLoanValidationService.finalizeClientLoan(id, "Rechazado");
-        fetchLoan();
+      e.preventDefault();
+      await ClientLoanValidationService.finalizeClientLoan(id, "Rechazado");
+      fetchLoan();
     };
 
-    const handleApprove = async () => {
+    const handleApprove = async (e) => {
+      e.preventDefault();
         const newLoan = {
             clientLoanId: loan.id,
             fireInsurance,
@@ -88,11 +86,11 @@ export const ClientLoanValidation = () => {
     };
 
     useEffect(() => {
-        fetchLoan();
+      fetchLoan();
     }, []);
 
     useEffect(() => {
-        setShowAdditionalFields(areAllDocumentsApproved());
+      setShowAdditionalFields(areAllDocumentsApproved());
     }, [clientDocuments, loan.documents, saving]);
 
   return (

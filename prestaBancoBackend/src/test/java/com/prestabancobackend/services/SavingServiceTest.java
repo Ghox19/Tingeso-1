@@ -4,6 +4,7 @@ import com.prestabancobackend.entities.ClientEntity;
 import com.prestabancobackend.entities.ClientLoanEntity;
 import com.prestabancobackend.entities.SavingEntity;
 import com.prestabancobackend.form.SavingForm;
+import com.prestabancobackend.form.SavingResultForm;
 import com.prestabancobackend.getForms.ClientLoanGetForm;
 import com.prestabancobackend.getForms.SavingGetForm;
 import com.prestabancobackend.repositories.ClientLoanRepository;
@@ -30,10 +31,10 @@ import static org.mockito.Mockito.*;
 class SavingServiceTest {
 
     @Mock
-    private ClientLoanRepository clientLoanRepository;
+    private SavingRepository savingRepository;
 
     @Mock
-    private SavingRepository savingRepository;
+    private ClientLoanRepository clientLoanRepository;
 
     @Mock
     private ClientLoanService clientLoanService;
@@ -42,13 +43,13 @@ class SavingServiceTest {
     private SavingService savingService;
 
     private SavingForm savingForm;
-
     private SavingForm savingForm2;
     private ClientLoanEntity clientLoan;
     private ClientLoanEntity clientLoan2;
     private SavingEntity savingEntity;
     private SavingEntity savingEntity2;
     private ClientEntity client;
+    private SavingResultForm savingResultForm;
 
     @BeforeEach
     void setUp() {
@@ -56,7 +57,7 @@ class SavingServiceTest {
         client = new ClientEntity();
         client.setMensualIncome(5000);
 
-        // Setup ClientLoan
+        // Setup ClientLoan - Corregir la asignación directa
         clientLoan = new ClientLoanEntity();
         clientLoan.setId(1L);
         clientLoan.setLoanAmount(10000);
@@ -67,13 +68,12 @@ class SavingServiceTest {
         clientLoan2.setLoanAmount(10000);
         clientLoan2.setClient(client);
 
-        // Setup SavingForm
+        // Setup SavingForm - Corregir la asignación directa
         savingForm = new SavingForm();
         savingForm.setClientLoanId(1L);
         savingForm.setActualBalance(2000);
         savingForm.setYears(3);
 
-        // Setup balances and withdraws for 12 months
         List<Integer> balances = Arrays.asList(1000, 1200, 1400, 1600, 1800, 2000,
                 2200, 2400, 2600, 2800, 3000, 3200);
         List<Integer> withdraws = Arrays.asList(100, 150, 200, 250, 300, 350,
@@ -85,23 +85,7 @@ class SavingServiceTest {
         savingForm.setWithdraw(withdraws);
         savingForm.setDeposit(deposits);
 
-        savingForm2 = new SavingForm();
-        savingForm2.setClientLoanId(2L);
-        savingForm2.setActualBalance(2000);
-        savingForm2.setYears(1);
-
-        List<Integer> balances2 = Arrays.asList(0, 1200, 1400, 1600, 1800, 2000,
-                2200, 2400, 2600, 2800, 3000, 3200);
-        List<Integer> withdraws2 = Arrays.asList(100, 150, 200, 250, 300, 350,
-                100, 200, 150, 100, 100, 200);
-        List<Integer> deposits2 = Arrays.asList(300, 0, 0, 0, 0, 550,
-                600, 650, 700, 750, 800, 850);
-
-        savingForm2.setBalances(balances2);
-        savingForm2.setWithdraw(withdraws2);
-        savingForm2.setDeposit(deposits2);
-
-        // Setup SavingEntity
+        // Setup SavingEntity - Corregir la asignación directa
         savingEntity = new SavingEntity();
         savingEntity.setId(1L);
         savingEntity.setActualBalance(2000);
@@ -111,15 +95,46 @@ class SavingServiceTest {
         savingEntity.setDeposit(deposits);
         savingEntity.setClientLoan(clientLoan);
 
-        savingEntity2 = new SavingEntity();
-        savingEntity2.setId(2L);
-        savingEntity2.setActualBalance(2000);
-        savingEntity2.setYears(1);
-        savingEntity2.setBalances(balances2);
-        savingEntity2.setWithdraw(withdraws2);
-        savingEntity2.setDeposit(deposits2);
-        savingEntity2.setClientLoan(clientLoan2);
+        savingResultForm = new SavingResultForm();
+        savingResultForm.setId(1L);
+        savingResultForm.setResult("Aprobado");
     }
+    @Test
+    void addSaving_ShouldReturnSavingId_WhenValidInput() {
+        // Arrange
+        when(clientLoanRepository.findById(1L)).thenReturn(Optional.of(clientLoan));
+        // Es importante que el save retorne el savingEntity con ID
+        when(savingRepository.save(any(SavingEntity.class))).thenAnswer(invocation -> {
+            SavingEntity savedEntity = invocation.getArgument(0);
+            savedEntity.setId(1L); // Asignar ID al entity que se está guardando
+            return savedEntity;
+        });
+
+        // Act
+        Long result = savingService.addSaving(savingForm);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1L, result);
+        verify(clientLoanRepository).findById(1L);
+        verify(savingRepository).save(any(SavingEntity.class));
+        verify(clientLoanRepository).save(any(ClientLoanEntity.class));
+    }
+
+    @Test
+    void addSaving_ShouldReturnNull_WhenClientLoanNotFound() {
+        // Arrange
+        when(clientLoanRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act
+        Long result = savingService.addSaving(savingForm);
+
+        // Assert
+        assertNull(result);
+        verify(clientLoanRepository).findById(1L);
+        verify(savingRepository, never()).save(any(SavingEntity.class));
+    }
+
 
     @Test
     void getSavingById_ShouldReturnSaving_WhenExists() {
@@ -138,54 +153,118 @@ class SavingServiceTest {
     }
 
     @Test
-    void getSavingById_ShouldThrowException_WhenNotExists() {
+    void updateStateSaving_ShouldApprove_WhenValidApprovalRequest() {
         // Arrange
-        when(savingRepository.findById(1L)).thenReturn(Optional.empty());
+        when(savingRepository.findById(1L)).thenReturn(Optional.of(savingEntity));
 
-        // Act & Assert
-        assertThrows(EntityNotFoundException.class, () ->
-                savingService.getSavingById(1L)
-        );
-        verify(savingRepository).findById(1L);
+        // Act
+        ResponseEntity<Object> response = savingService.updateStateSaving(savingResultForm);
+
+        // Assert
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("Se Aprobo correctamente la cuenta", response.getBody());
+        verify(savingRepository).save(argThat(saving ->
+                saving.getResult().equals("Aprobado")
+        ));
     }
 
     @Test
-    void verifyConditions_ShouldReturnAppropriateReasons() {
+    void updateStateSaving_ShouldReject_WhenRejectionRequest() {
+        // Arrange
+        savingResultForm.setResult("Rechazado");
+        when(savingRepository.findById(1L)).thenReturn(Optional.of(savingEntity));
+
+        // Act
+        ResponseEntity<Object> response = savingService.updateStateSaving(savingResultForm);
+
+        // Assert
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("Se Rechazo correctamente la cuenta", response.getBody());
+        verify(savingRepository).save(argThat(saving ->
+                saving.getResult().equals("Rechazado")
+        ));
+        verify(clientLoanRepository).save(argThat(loan ->
+                loan.getFase().equals("Rechazado")
+        ));
+    }
+
+    @Test
+    void updateStateSaving_ShouldReturnBadRequest_WhenSavingNotFound() {
+        // Arrange
+        when(savingRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act
+        ResponseEntity<Object> response = savingService.updateStateSaving(savingResultForm);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("No se encontro la Cuenta de Ahorros", response.getBody());
+        verify(savingRepository, never()).save(any());
+    }
+
+    @Test
+    void verifyConditions_ShouldReturnAllReasons_WhenAllConditionsFail() {
         // Arrange
         savingEntity.setActualBalance(500); // Less than 10% of loan amount
+        savingEntity.setYears(1); // Will trigger additional validation
 
         // Act
         List<String> reasons = savingService.verifyConditions(savingEntity);
 
         // Assert
         assertTrue(reasons.contains("R71: No cumple con el saldo mínimo requerido (10% del préstamo)."));
+        assertTrue(reasons.contains("R74: No cumple con la relación saldo/antigüedad requerida."));
     }
 
     @Test
-    void verificarHistorialAhorro_ShouldReturnTrue_WhenValidHistory() {
+    void verificarHistorialAhorro_ShouldReturnFalse_WhenNegativeBalance() {
         // Arrange
-        Integer[] balances = {1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200};
+        Integer[] balances = {-1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200};
         Integer[] withdraws = {100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650};
 
         // Act
         boolean result = savingService.verificarHistorialAhorro(balances, withdraws);
 
         // Assert
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
-    void verificarDepositosPeriodicos_ShouldReturnTrue_WhenValidDeposits() {
+    void addSaving_ShouldSetRejectedStatus_WhenMoreThanThreeReasons() {
         // Arrange
-        List<Integer> deposits = Arrays.asList(300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850);
-        Integer mensualIncome = 5000;
+        // Configurar savingForm para que falle múltiples validaciones
+        savingForm.setActualBalance(500); // Para fallar R71 (saldo mínimo)
+        savingForm.setYears(1); // Para fallar R74 (relación saldo/antigüedad)
+
+        // Configurar depósitos irregulares para fallar R73
+        List<Integer> lowDeposits = Arrays.asList(100, 0, 0, 0, 0, 100, 100, 100, 100, 100, 100, 100);
+        savingForm.setDeposit(lowDeposits);
+
+        // Configurar retiros altos para fallar R75
+        List<Integer> highWithdraws = Arrays.asList(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000);
+        savingForm.setWithdraw(highWithdraws);
+
+        when(clientLoanRepository.findById(1L)).thenReturn(Optional.of(clientLoan));
+        when(savingRepository.save(any(SavingEntity.class))).thenAnswer(invocation -> {
+            SavingEntity savedEntity = invocation.getArgument(0);
+            savedEntity.setId(1L);
+            return savedEntity;
+        });
 
         // Act
-        boolean result = savingService.verificarDepositosPeriodicos(deposits, mensualIncome);
+        Long result = savingService.addSaving(savingForm);
 
         // Assert
-        assertTrue(result);
+        assertNotNull(result);
+        verify(savingRepository).save(argThat(saving -> {
+            boolean hasCorrectResult = saving.getResult().equals("Rechazado");
+            boolean hasEnoughReasons = saving.getReasons().size() > 3;
+            return hasCorrectResult && hasEnoughReasons;
+        }));
+
+        verify(clientLoanRepository).save(argThat(loan ->
+                loan.getFase().equals("Rechazado") &&
+                        loan.getMessage().equals("El Prestamo fue Rechazado por no cumplir correctamente con la Cuenta de Ahorros")
+        ));
     }
-
-
 }

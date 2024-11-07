@@ -31,26 +31,26 @@ class DocumentServiceTest {
     @InjectMocks
     private DocumentService documentService;
 
-    private DocumentEntity document1;
     private DocumentForm documentForm;
+    private DocumentEntity documentEntity;
     private MultipartFile multipartFile;
 
     @BeforeEach
     void setUp() {
-        // Setup DocumentEntity
-        document1 = new DocumentEntity();
-        document1.setId(1L);
-        document1.setName("test.pdf");
-        document1.setContent("test content".getBytes());
-        document1.setType("application/pdf");
-        document1.setApproved(true);
-
         // Setup DocumentForm
         documentForm = new DocumentForm();
         documentForm.setName("test.pdf");
-        documentForm.setContent(Base64.getEncoder().encodeToString("test content".getBytes()));
+        documentForm.setContent("dGVzdCBjb250ZW50"); // "test content" in Base64
         documentForm.setType("application/pdf");
         documentForm.setApproved(true);
+
+        // Setup DocumentEntity
+        documentEntity = new DocumentEntity();
+        documentEntity.setId(1L);
+        documentEntity.setName("test.pdf");
+        documentEntity.setContent("test content".getBytes());
+        documentEntity.setType("application/pdf");
+        documentEntity.setApproved(true);
 
         // Setup MultipartFile mock
         multipartFile = mock(MultipartFile.class);
@@ -59,23 +59,23 @@ class DocumentServiceTest {
     @Test
     void saveDocument_ShouldSaveAndReturnDocument() {
         // Arrange
-        when(documentRepository.save(any(DocumentEntity.class))).thenReturn(document1);
+        when(documentRepository.save(any(DocumentEntity.class))).thenReturn(documentEntity);
 
         // Act
         DocumentEntity savedDocument = documentService.saveDocument(documentForm);
 
         // Assert
         assertNotNull(savedDocument);
-        assertEquals(document1.getName(), savedDocument.getName());
-        assertEquals(document1.getType(), savedDocument.getType());
-        assertEquals(document1.getApproved(), savedDocument.getApproved());
+        assertEquals(documentEntity.getName(), savedDocument.getName());
+        assertEquals(documentEntity.getType(), savedDocument.getType());
+        assertEquals(documentEntity.getApproved(), savedDocument.getApproved());
         verify(documentRepository).save(any(DocumentEntity.class));
     }
 
     @Test
     void getAll_ShouldReturnAllDocuments() {
         // Arrange
-        List<DocumentEntity> expectedDocuments = Arrays.asList(document1);
+        List<DocumentEntity> expectedDocuments = Arrays.asList(documentEntity);
         when(documentRepository.findAll()).thenReturn(expectedDocuments);
 
         // Act
@@ -87,61 +87,120 @@ class DocumentServiceTest {
     }
 
     @Test
-    void getDocument_ShouldReturnDocument() {
+    void getDocument_ShouldReturnDocument_WhenExists() {
         // Arrange
-        when(documentRepository.findById(1L)).thenReturn(Optional.of(document1));
+        when(documentRepository.findById(1L)).thenReturn(Optional.of(documentEntity));
 
         // Act
-        DocumentEntity foundDocument = documentService.getDocument(1L);
+        DocumentEntity result = documentService.getDocument(1L);
 
         // Assert
-        assertNotNull(foundDocument);
-        assertEquals(document1, foundDocument);
+        assertNotNull(result);
+        assertEquals(documentEntity, result);
         verify(documentRepository).findById(1L);
     }
 
     @Test
-    void getDocument_ShouldReturnNull_WhenDocumentNotFound() {
+    void getDocument_ShouldReturnNull_WhenNotExists() {
         // Arrange
         when(documentRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act
-        DocumentEntity foundDocument = documentService.getDocument(1L);
+        DocumentEntity result = documentService.getDocument(1L);
 
         // Assert
-        assertNull(foundDocument);
+        assertNull(result);
         verify(documentRepository).findById(1L);
     }
 
     @Test
     void returnJSON_ShouldReturnDocumentEntity() throws IOException {
         // Arrange
-        when(multipartFile.getOriginalFilename()).thenReturn("test.pdf");
-        when(multipartFile.getBytes()).thenReturn("test content".getBytes());
+        String fileName = "test.pdf";
+        byte[] content = "test content".getBytes();
+        when(multipartFile.getOriginalFilename()).thenReturn(fileName);
+        when(multipartFile.getBytes()).thenReturn(content);
 
         // Act
         DocumentEntity result = documentService.returnJSON(multipartFile);
 
         // Assert
         assertNotNull(result);
-        assertEquals("test.pdf", result.getName());
-        assertArrayEquals("test content".getBytes(), result.getContent());
+        assertEquals(fileName, result.getName());
+        assertArrayEquals(content, result.getContent());
     }
 
     @Test
     void setDocumentSaveForm_ShouldReturnDocumentSaveForm() {
         // Act
-        DocumentSaveForm result = documentService.setDocumentSaveForm(document1);
+        DocumentSaveForm result = documentService.setDocumentSaveForm(documentEntity);
 
         // Assert
         assertNotNull(result);
-        assertEquals(document1.getId(), result.getId());
-        assertEquals(document1.getName(), result.getName());
-        assertEquals(document1.getType(), result.getType());
-        assertEquals(document1.getApproved(), result.getApproved());
+        assertEquals(documentEntity.getId(), result.getId());
+        assertEquals(documentEntity.getName(), result.getName());
+        assertEquals(documentEntity.getType(), result.getType());
+        assertEquals(documentEntity.getApproved(), result.getApproved());
     }
 
     @Test
-    void name() {
+    void updateDocument_ShouldUpdateAndReturnDocument_WhenExists() {
+        // Arrange
+        DocumentForm updateForm = new DocumentForm();
+        updateForm.setName("updated.pdf");
+        updateForm.setContent("dXBkYXRlZCBjb250ZW50"); // "updated content" in Base64
+        updateForm.setType("application/pdf");
+        updateForm.setApproved(false);
+
+        when(documentRepository.findById(1L)).thenReturn(Optional.of(documentEntity));
+        when(documentRepository.save(any(DocumentEntity.class))).thenReturn(documentEntity);
+
+        // Act
+        DocumentEntity updatedDocument = documentService.updateDocument(1L, updateForm);
+
+        // Assert
+        assertNotNull(updatedDocument);
+        assertEquals(updateForm.getName(), updatedDocument.getName());
+        assertEquals(updateForm.getType(), updatedDocument.getType());
+        assertEquals(updateForm.getApproved(), updatedDocument.getApproved());
+        verify(documentRepository).findById(1L);
+        verify(documentRepository).save(any(DocumentEntity.class));
+    }
+
+    @Test
+    void updateDocument_ShouldThrowException_WhenNotExists() {
+        // Arrange
+        when(documentRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () ->
+                documentService.updateDocument(1L, documentForm)
+        );
+        verify(documentRepository).findById(1L);
+        verify(documentRepository, never()).save(any(DocumentEntity.class));
+    }
+
+    @Test
+    void updateDocument_ShouldNotUpdateContent_WhenContentIsNull() {
+        // Arrange
+        DocumentForm updateForm = new DocumentForm();
+        updateForm.setName("updated.pdf");
+        updateForm.setContent(null);
+        updateForm.setType("application/pdf");
+        updateForm.setApproved(false);
+
+        DocumentEntity existingDocument = new DocumentEntity();
+        existingDocument.setContent("original content".getBytes());
+
+        when(documentRepository.findById(1L)).thenReturn(Optional.of(existingDocument));
+        when(documentRepository.save(any(DocumentEntity.class))).thenReturn(existingDocument);
+
+        // Act
+        DocumentEntity updatedDocument = documentService.updateDocument(1L, updateForm);
+
+        // Assert
+        assertNotNull(updatedDocument);
+        assertArrayEquals("original content".getBytes(), updatedDocument.getContent());
+        verify(documentRepository).save(any(DocumentEntity.class));
     }
 }
