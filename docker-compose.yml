@@ -8,6 +8,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -94,3 +96,8 @@ services:
 
 networks:
   app-network:
+
+# Agregar al final del archivo, después de networks
+volumes:
+  postgres_data:
+    driver: local
