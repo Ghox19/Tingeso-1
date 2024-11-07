@@ -4,12 +4,9 @@ import com.prestabancobackend.form.SavingForm;
 import com.prestabancobackend.form.SavingResultForm;
 import com.prestabancobackend.getForms.SavingGetForm;
 import com.prestabancobackend.services.SavingService;
-import jakarta.persistence.OneToMany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/saving")

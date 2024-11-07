@@ -9,7 +9,6 @@ import com.prestabancobackend.getForms.ClientLoanGetForm;
 import com.prestabancobackend.getForms.SavingGetForm;
 import com.prestabancobackend.repositories.ClientLoanRepository;
 import com.prestabancobackend.repositories.SavingRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,11 +42,9 @@ class SavingServiceTest {
     private SavingService savingService;
 
     private SavingForm savingForm;
-    private SavingForm savingForm2;
     private ClientLoanEntity clientLoan;
     private ClientLoanEntity clientLoan2;
     private SavingEntity savingEntity;
-    private SavingEntity savingEntity2;
     private ClientEntity client;
     private SavingResultForm savingResultForm;
 
