@@ -1,106 +1,85 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useLocation } from 'react-router-dom';
-import { getApiUrl } from '../enviroment';
+import { SavingValidationService } from '../services/savingValidationService';
 
 export const SavingValidation = () => {
-  const location = useLocation();
-  const API_URL = getApiUrl();
+    const location = useLocation();
+    const { id, idSaving } = location.state || {};
+    const [actualIdSaving, setActualIdSaving] = useState(idSaving);
 
-  const { id, idSaving } = location.state || {};
-  const [actualIdSaving, setActualIdSaving] = useState(idSaving);
+    const [formData, setFormData] = useState({
+        clientLoanId: id,
+        years: '',
+        actualBalance: '',
+        balances: Array(12).fill(''),
+        deposit: Array(12).fill(''),
+        withdraw: Array(12).fill('')
+    });
 
-  const [formData, setFormData] = useState({
-    clientLoanId: id,
-    years: '',
-    actualBalance: '',
-    balances: Array(12).fill(''),
-    deposit: Array(12).fill(''),
-    withdraw: Array(12).fill('')
-  });
+    const [reasons, setReasons] = useState([]);
 
-  const [reasons, setReasons] = useState([]);
+    const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
 
-  const fetchSaving = async () => {
-    try {
-      console.log(actualIdSaving); 
-      const response = await axios.get(`${API_URL}/saving/${actualIdSaving}`);
-      setFormData(response.data);
-      setReasons(response.data.reasons);
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error fetching loans:', error);
-    }
-  };
+    const fetchSaving = async () => {
+        try {
+            const data = await SavingValidationService.getSavingById(actualIdSaving);
+            setFormData(data);
+            setReasons(data.reasons);
+        } catch (error) {
+            console.error('Error fetching saving:', error);
+        }
+    };
 
-  const months = [
-    '1', '2', '3', '4', '5', '6',
-    '7', '8', '9', '10', '11', '12'
-  ];
+    const handleInputChange = (e, index, field) => {
+        const { value } = e.target;
+        
+        if (field === 'years' || field === 'actualBalance') {
+            setFormData(prev => ({
+                ...prev,
+                [field]: value
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [field]: prev[field].map((item, i) => i === index ? value : item)
+            }));
+        }
+    };
 
-  const handleInputChange = (e, index, field) => {
-    const { value } = e.target;
-    
-    if (field === 'years' || field === 'actualBalance') {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [field]: prev[field].map((item, i) => i === index ? value : item)
-      }));
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            SavingValidationService.validateSavingData(formData);
+            const newSavingId = await SavingValidationService.createSaving(formData);
+            setActualIdSaving(newSavingId);
+        } catch (error) {
+            console.error('Error creating saving:', error);
+        }
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-      try {
-        const response = await axios.post(`${API_URL}/saving`, formData);
-        setActualIdSaving(response.data);
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-      }
-    console.log(formData);
-  };
+    const handleApproved = async () => {
+        try {
+            await SavingValidationService.updateSavingStatus(actualIdSaving, "Aprobado");
+            fetchSaving();
+        } catch (error) {
+            console.error('Error approving saving:', error);
+        }
+    };
 
-  const handleApproved = async (e) => {
-    const newFormData = {
-      id: actualIdSaving,
-      result: "Aprobado"
-    }
-      try {
-        const response = await axios.put(`${API_URL}/saving`, newFormData);
-        console.log(response.data);
-        fetchSaving();
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-      }
-    console.log(formData);
-  };
+    const handleReject = async () => {
+        try {
+            await SavingValidationService.updateSavingStatus(actualIdSaving, "Rechazado");
+            fetchSaving();
+        } catch (error) {
+            console.error('Error rejecting saving:', error);
+        }
+    };
 
-  const handleReject = async (e) => {
-    const newFormData = {
-      id: actualIdSaving,
-      result: "Rechazado"
-    }
-      try {
-        const response = await axios.put(`${API_URL}/saving`, newFormData);
-        console.log(response.data);
-        fetchSaving();
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-      }
-    console.log(formData);
-  };
-
-  useEffect(() => {
-    if (actualIdSaving !== 0) {
-      console.log(idSaving); 
-      fetchSaving();
-    }
-  }, [actualIdSaving]); // Se ejecutará cuando idSaving cambie
+    useEffect(() => {
+        if (actualIdSaving !== 0) {
+            fetchSaving();
+        }
+    }, [actualIdSaving]);
 
   return (
     <div className="min-h-screen bg-[#282C35] p-6">

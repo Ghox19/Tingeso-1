@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { LoanInfo } from '../components/LoanInfo';
-import { getApiUrl } from '../enviroment';
+import { ClientLoanPageService } from '../services/clientLoanPageService';
 
 export const ClientLoanPage = () => {
-  const API_URL = getApiUrl();
-
   const [loans, setLoans] = useState([]);
 
   useEffect(() => {
     const fetchLoans = async () => {
       try {
-        const response = await axios.get(`${API_URL}/clientLoan`);
-        setLoans(response.data);
+        const data = await ClientLoanPageService.getClientLoans();
+        setLoans(data);
       } catch (error) {
         console.error('Error fetching loans:', error);
       }
@@ -20,6 +17,7 @@ export const ClientLoanPage = () => {
 
     fetchLoans();
   }, []);
+
 
   return (
     <div className="min-h-screen">

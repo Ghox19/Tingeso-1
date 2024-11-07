@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { LoanCard } from '../components/loanCard';
-import { getApiUrl } from '../enviroment';
+import { LoanSelectionService } from '../services/loanSelectionService';
 
 export const LoanSelection = () => {
-  const API_URL = getApiUrl();
-  const [loans, setLoans] = useState([]);
+    const [loans, setLoans] = useState([]);
 
-  useEffect(() => {
-    const fetchLoans = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/loan`);
-        setLoans(response.data);
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-      }
-    };
+    useEffect(() => {
+        const fetchLoans = async () => {
+            try {
+                const data = await LoanSelectionService.getAllLoans();
+                setLoans(data);
+            } catch (error) {
+                console.error('Error fetching loans:', error);
+            }
+        };
 
-    fetchLoans();
-  }, []);
-
+        fetchLoans();
+    }, []);
   return (
     <div>
       <div className="container mx-auto px-4 py-8 flex flex-col space-y-8 max-w-2xl">

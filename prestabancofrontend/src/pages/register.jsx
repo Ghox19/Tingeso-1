@@ -1,71 +1,70 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { PdfUploader } from '../components/pdfUploader';
-import { getApiUrl } from '../enviroment';
 import { useNavigate } from 'react-router-dom';
+import { PdfUploader } from '../components/pdfUploader';
+import { RegisterService } from '../services/registerService';
 
 export const Register = () => {
-  const API_URL = getApiUrl();
-  const navigate = useNavigate();
-  const [showSuccess, setShowSuccess] = useState(false);
+    const navigate = useNavigate();
+    const [showSuccess, setShowSuccess] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    lastName: '',
-    rut: '',
-    email: '',
-    years: '',
-    contact: '',
-    jobType: '',
-    mensualIncome: '',
-    jobYears: '',
-    totalDebt: '',
-    documents: {
-      carnet: null,
-      impuestos: null,
-      deudas: null,
-      ahorros: null
-    }
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleDocumentUpload = (json, documentType) => {
-    setFormData(prevState => ({
-        ...prevState,
+    const [formData, setFormData] = useState({
+        name: '',
+        lastName: '',
+        rut: '',
+        email: '',
+        years: '',
+        contact: '',
+        jobType: '',
+        mensualIncome: '',
+        jobYears: '',
+        totalDebt: '',
         documents: {
-            ...prevState.documents,
-            [documentType]: { ...json, type: documentType, approved: false }
+            carnet: null,
+            impuestos: null,
+            deudas: null,
+            ahorros: null
         }
-    }));
-  };
+    });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const documentsArray = Object.values(formData.documents).filter(doc => doc !== null);
-    const dataToSend = {
-      ...formData,
-      documents: documentsArray
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
     };
-    
-    try {
-      const response = await axios.post(`${API_URL}/client`, dataToSend, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      setShowSuccess(true);
-      setTimeout(() => {
-        navigate('/');
-      }, 3000);
-    } catch (error) {
-      console.error('Error registering client:', error);
-    }
-  };
+
+    const handleDocumentUpload = (json, documentType) => {
+        setFormData(prevState => ({
+            ...prevState,
+            documents: {
+                ...prevState.documents,
+                [documentType]: { ...json, type: documentType, approved: false }
+            }
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        try {
+            // Validar los datos del formulario
+            RegisterService.validateFormData(formData);
+            
+            // Registrar el cliente
+            await RegisterService.registerClient(formData);
+            
+            // Mostrar mensaje de éxito y redirigir
+            setShowSuccess(true);
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
+        } catch (error) {
+            console.error('Error en el registro:', error.message);
+            // Aquí podrías manejar los errores, por ejemplo mostrando un mensaje al usuario
+        }
+    };
+
   
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
@@ -304,7 +303,7 @@ export const Register = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#3D2A3B] hover:bg-[#2A353D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D2A3B] transition-colors duration-200"
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#2F3429] hover:bg-[#2A353D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3D2A3B] transition-colors duration-200"
             >
               Registrarse
             </button>

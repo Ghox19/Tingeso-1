@@ -1,167 +1,99 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { getApiUrl } from '../enviroment';
+import { ClientLoanValidationService } from '../services/clientLoanValidationService';
 
 export const ClientLoanValidation = () => {
-  const API_URL = getApiUrl();
-  const navigate = useNavigate();
-  const location = useLocation();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { id } = location.state || {};
 
-  const { id } = location.state || {};  // Extrae id del estado
-  const [loan, setLoan] = useState([]);
-  const [client, setClient] = useState([]);
-  const [clientDocuments, setClientDocuments] = useState([]);
-  const [idSaving, setIdSaving] = useState(0);
-  const [saving, setSaving] = useState([]);
+    const [loan, setLoan] = useState([]);
+    const [client, setClient] = useState([]);
+    const [clientDocuments, setClientDocuments] = useState([]);
+    const [idSaving, setIdSaving] = useState(0);
+    const [saving, setSaving] = useState([]);
+    const [showAdditionalFields, setShowAdditionalFields] = useState(false);
+    const [fireInsurance, setFireInsurance] = useState('');
+    const [deduction, setDeduction] = useState('');
+    const [showMessage, setShowMessage] = useState(false);
+    const [rejectMessage, setRejectMessage] = useState('');
 
-  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
-  const [fireInsurance, setFireInsurance] = useState('');
-  const [deduction, setDeduction] = useState('');
-
-  const [showMessage, setShowMessage] = useState(false);
-  const [rejectMessage, setRejectMessage] = useState('');
-
-  const areAllDocumentsApproved = () => {
-    const areClientDocsApproved = clientDocuments.every(doc => doc.approved);
-    const areLoanDocsApproved = loan.documents?.every(doc => doc.approved);
-    const isSavingApproved = saving.result === "Aprobado";
-    
-    return areClientDocsApproved && areLoanDocsApproved && isSavingApproved;
-  };
-
-  const fetchLoan = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/clientLoan/${id}`);
-      setLoan(response.data);
-      setClient(response.data.client);
-      fetchClientDocuments(response.data.client.id);
-      if (response.data.savings !== null) {
-        setSaving(response.data.savings);
-        setIdSaving(response.data.savings.id);
-      }
-    } catch (error) {
-      console.error('Error fetching loans:', error);
-    }
-  };
-
-  const fetchClientDocuments = async (id) => {
-    try {
-      const response = await axios.get(`${API_URL}/client/documents/${id}`);
-      setClientDocuments(response.data);
-    } catch (error) {
-      console.error('Error fetching Client Documents:', error);
-    }
-  };
-
-  const handleDownload = async (id, name) => {
-    try {
-        const response = await axios.get(`${API_URL}/document/download/${id}`, {
-            responseType: 'blob',
-            headers: {
-                'Accept': 'application/pdf'
-            }
-        });
-
-        // Crear un blob con el tipo correcto
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', name.endsWith('.pdf') ? name : `${name}.pdf`);
-        document.body.appendChild(link);
-        link.click();
-
-        // Limpieza
-        window.URL.revokeObjectURL(url);
-        link.remove();
-    } catch (error) {
-        console.error('Error downloading the document', error);
-    }
-  };
-  
-  const handleSavings = async () => {
-    navigate('/savingValidation', { state: {id, idSaving} });
-  };
-
-  const handleDocumentError = async () => {
-    navigate('/');
-  };
-
-  const handleDocumentApproved = async (id, document) => {
-    document.approved = true;
-    try {
-        const response = await axios.put(`${API_URL}/document/${id}`, document);
-        fetchLoan();
-    } catch (error) {
-        console.error('Error approving the document', error);
-    }
-  };
-
-  const handleReject = async (e) => {
-    e.preventDefault();
-    const newFormData = {
-      id: id,
-      message: rejectMessage
-    }
-    try {
-      const response = await axios.put(`${API_URL}/clientLoan/reject`, newFormData);
-      setShowMessage(false);
-      fetchLoan();
-    } catch (error) {
-      console.error('Error rejecting the loan', error);
-    }
-  }
-
-  const handleClientApproved = async (e) => {
-    e.preventDefault();
-    const newFormData = {
-      id: id,
-      fase: "Desembolso"
-    }
-      try {
-        const response = await axios.put(`${API_URL}/clientLoan/final`, newFormData);
-        fetchLoan();
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-      }
-  };
-
-  const handleClientReject  = async (e) => {
-    e.preventDefault();
-    const newFormData = {
-      id: id,
-      fase: "Rechazado"
-    }
-      try {
-        const response = await axios.put(`${API_URL}/clientLoan/final`, newFormData);
-        fetchLoan();
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-      }
-  };
-
-  const handleApprove = async () => {
-    const newLoan = {
-      clientLoanId: loan.id,
-      fireInsurance: fireInsurance,
-      deduction: deduction
+    const areAllDocumentsApproved = () => {
+        const areClientDocsApproved = clientDocuments.every(doc => doc.approved);
+        const areLoanDocsApproved = loan.documents?.every(doc => doc.approved);
+        const isSavingApproved = saving.result === "Aprobado";
+        return areClientDocsApproved && areLoanDocsApproved && isSavingApproved;
     };
-    try {
-      const response = await axios.put(`${API_URL}/clientLoan/preApproved`, newLoan);
-      fetchLoan();
-    } catch (error) {
-      console.error('Error approving the loan', error);
-    }
-  }
 
-  useEffect(() => {
-    fetchLoan();
-  }, []);
+    const fetchLoan = async () => {
+        try {
+            const loanData = await ClientLoanValidationService.getClientLoanById(id);
+            setLoan(loanData);
+            setClient(loanData.client);
+            const documentsData = await ClientLoanValidationService.fetchClientDocuments(loanData.client.id);
+            setClientDocuments(documentsData);
+            if (loanData.savings !== null) {
+                setSaving(loanData.savings);
+                setIdSaving(loanData.savings.id);
+            }
+        } catch (error) {
+            console.error('Error fetching loans:', error);
+        }
+    };
 
-  useEffect(() => {
-    setShowAdditionalFields(areAllDocumentsApproved());
-  }, [clientDocuments, loan.documents, saving]);
+    const handleDownload = async (id, name) => {
+        await ClientLoanValidationService.downloadDocument(id, name);
+    };
+
+    const handleSavings = () => {
+        navigate('/savingValidation', { state: {id, idSaving} });
+    };
+
+    const handleDocumentError = () => {
+        navigate('/');
+    };
+
+    const handleDocumentApproved = async (id, document) => {
+        await ClientLoanValidationService.approveDocument(id, document);
+        fetchLoan();
+    };
+
+    const handleReject = async (e) => {
+        e.preventDefault();
+        await ClientLoanValidationService.rejectLoan(id, rejectMessage);
+        setShowMessage(false);
+        fetchLoan();
+    };
+
+    const handleClientApproved = async (e) => {
+        e.preventDefault();
+        await ClientLoanValidationService.finalizeClientLoan(id, "Desembolso");
+        fetchLoan();
+    };
+
+    const handleClientReject = async (e) => {
+        e.preventDefault();
+        await ClientLoanValidationService.finalizeClientLoan(id, "Rechazado");
+        fetchLoan();
+    };
+
+    const handleApprove = async () => {
+        const newLoan = {
+            clientLoanId: loan.id,
+            fireInsurance,
+            deduction
+        };
+        await ClientLoanValidationService.preApproveLoan(newLoan);
+        fetchLoan();
+    };
+
+    useEffect(() => {
+        fetchLoan();
+    }, []);
+
+    useEffect(() => {
+        setShowAdditionalFields(areAllDocumentsApproved());
+    }, [clientDocuments, loan.documents, saving]);
 
   return (
     <div className="min-h-screen bg-[#282C35] text-white p-6">
