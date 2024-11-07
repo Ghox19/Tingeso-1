@@ -56,7 +56,7 @@ export const Navbar = () => {
               }`}
               onClick={handleView}
             >
-              Ver Solicitudes
+              Listar Solicitudes
             </button>
           </div>
         </div>
