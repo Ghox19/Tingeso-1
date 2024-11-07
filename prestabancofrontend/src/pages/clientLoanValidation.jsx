@@ -302,7 +302,7 @@ export const ClientLoanValidation = () => {
                     >
                       Descargar
                     </button>
-                    {loan.fase === "Revision Inicial" && !doc.approved && (
+                    {loan.fase === "En Revision Inicial" && !doc.approved && (
                       <button 
                         onClick={() => handleDocumentApproved(doc.id, doc)}
                         className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded-md text-sm transition-colors"
