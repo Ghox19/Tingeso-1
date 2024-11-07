@@ -85,8 +85,10 @@ export const ClientLoanValidation = () => {
     };
 
     useEffect(() => {
-      fetchLoan();
-    }, []);
+      if (id) {
+          fetchLoan();
+      }
+    },[id]);
 
     useEffect(() => {
       setShowAdditionalFields(areAllDocumentsApproved());
