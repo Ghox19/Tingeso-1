@@ -25,22 +25,21 @@ export const ClientLoanValidation = () => {
       return areClientDocsApproved && areLoanDocsApproved && isSavingApproved;
     };
 
-    const fetchLoan = async (e) => {
-      e.preventDefault();
-        try {
-            const loanData = await ClientLoanValidationService.getClientLoanById(id);
-            setLoan(loanData);
-            setClient(loanData.client);
-            const documentsData = await ClientLoanValidationService.fetchClientDocuments(loanData.client.id);
-            setClientDocuments(documentsData);
-            if (loanData.savings !== null) {
-                setSaving(loanData.savings);
-                setIdSaving(loanData.savings.id);
-            }
-        } catch (error) {
-            console.error('Error fetching loans:', error);
-        }
-    };
+    const fetchLoan = async () => {
+      try {
+          const loanData = await ClientLoanValidationService.getClientLoanById(id);
+          setLoan(loanData);
+          setClient(loanData.client);
+          const documentsData = await ClientLoanValidationService.fetchClientDocuments(loanData.client.id);
+          setClientDocuments(documentsData);
+          if (loanData.savings !== null) {
+              setSaving(loanData.savings);
+              setIdSaving(loanData.savings.id);
+          }
+      } catch (error) {
+          console.error('Error fetching loans:', error);
+      }
+  };
 
     const handleDownload = async (id, name) => {
       await ClientLoanValidationService.downloadDocument(id, name);
