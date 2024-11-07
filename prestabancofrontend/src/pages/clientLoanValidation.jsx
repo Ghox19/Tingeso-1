@@ -286,33 +286,37 @@ export const ClientLoanValidation = () => {
           <div className="bg-[#2A353D] p-4 rounded-lg">
             <h3 className="text-xl font-bold mb-4">Documentos Clientes</h3>
             <div className="space-y-3 text-lg">
-              {clientDocuments?.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between bg-[#282C35] p-3 rounded-md">
-                  <div className="space-x-4">
-                    <span>{doc.name}</span>
-                    <span className="text-gray-400">{doc.type}</span>
-                    <span className={`${doc.approved ? 'text-green-500' : 'text-red-500'}`}>
-                      {doc.approved ? "Aprobado" : "No aprobado"}
-                    </span>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleDownload(doc.id, doc.name)}
-                      className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md text-sm transition-colors"
-                    >
-                      Descargar
-                    </button>
-                    {loan.fase === "En Revision Inicial" && !doc.approved && (
+              {clientDocuments && clientDocuments.length > 0 ? (
+                clientDocuments.map((doc) => (
+                  <div key={doc.id} className="flex items-center justify-between bg-[#282C35] p-3 rounded-md">
+                    <div className="space-x-4">
+                      <span>{doc.name}</span>
+                      <span className="text-gray-400">{doc.type}</span>
+                      <span className={`${doc.approved ? 'text-green-500' : 'text-red-500'}`}>
+                        {doc.approved ? "Aprobado" : "No aprobado"}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2">
                       <button 
-                        onClick={() => handleDocumentApproved(doc.id, doc)}
-                        className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded-md text-sm transition-colors"
+                        onClick={() => handleDownload(doc.id, doc.name)}
+                        className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md text-sm transition-colors"
                       >
-                        Aprobar
+                        Descargar
                       </button>
-                    )}
+                      {loan.fase === "En Revision Inicial" && !doc.approved && (
+                        <button 
+                          onClick={() => handleDocumentApproved(doc.id, doc)}
+                          className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded-md text-sm transition-colors"
+                        >
+                          Aprobar
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p>No hay documentos disponibles</p>
+              )}
             </div>
           </div>
             
