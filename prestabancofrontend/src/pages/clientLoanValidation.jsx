@@ -19,7 +19,9 @@ export const ClientLoanValidation = () => {
   const [fireInsurance, setFireInsurance] = useState('');
   const [deduction, setDeduction] = useState('');
 
-  // Añade esta función para verificar si todos los documentos están aprobados
+  const [showMessage, setShowMessage] = useState(false);
+  const [rejectMessage, setRejectMessage] = useState('');
+
   const areAllDocumentsApproved = () => {
     const areClientDocsApproved = clientDocuments.every(doc => doc.approved);
     const areLoanDocsApproved = loan.documents?.every(doc => doc.approved);
@@ -96,6 +98,49 @@ export const ClientLoanValidation = () => {
     }
   };
 
+  const handleReject = async (e) => {
+    e.preventDefault();
+    const newFormData = {
+      id: id,
+      message: rejectMessage
+    }
+    try {
+      const response = await axios.put(`${API_URL}/clientLoan/reject`, newFormData);
+      setShowMessage(false);
+      fetchLoan();
+    } catch (error) {
+      console.error('Error rejecting the loan', error);
+    }
+  }
+
+  const handleClientApproved = async (e) => {
+    e.preventDefault();
+    const newFormData = {
+      id: id,
+      fase: "Desembolso"
+    }
+      try {
+        const response = await axios.put(`${API_URL}/clientLoan/final`, newFormData);
+        fetchLoan();
+      } catch (error) {
+        console.error('Error fetching loans:', error);
+      }
+  };
+
+  const handleClientReject  = async (e) => {
+    e.preventDefault();
+    const newFormData = {
+      id: id,
+      fase: "Rechazado"
+    }
+      try {
+        const response = await axios.put(`${API_URL}/clientLoan/final`, newFormData);
+        fetchLoan();
+      } catch (error) {
+        console.error('Error fetching loans:', error);
+      }
+  };
+
   const handleApprove = async () => {
     const newLoan = {
       clientLoanId: loan.id,
@@ -132,6 +177,22 @@ export const ClientLoanValidation = () => {
         <li><strong>Cuota/Ingreso:</strong> {loan.cuotaIncome}%</li>
         <li><strong>Deuda/Ingreso:</strong> {loan.debtCuota}%</li>
         <li><strong>Fase Actual:</strong> {loan.fase}</li>
+        {loan.totalCost !== null &&(
+          <div>
+            <li><strong>Costo Total:</strong> ${loan.totalCost}</li>
+            <li><strong>Seguro de Degravamen:</strong> {loan.deduction}%</li>
+            <li><strong>Seguro de Incendios:</strong> ${loan.fireInsurance}</li>
+          </div>
+        )}
+        {loan.fase === "Pre-Aprobada" &&(
+            <div>
+              <button onClick={handleClientApproved}>Aprobar</button>
+              <button onClick={handleClientReject}>Rechazar</button>
+            </div>
+        )}
+        {loan.message !== null &&(
+          <li><strong>Mensaje:</strong> {loan.message}</li>
+        )}
         <h3>Documentos Credito</h3>
         {loan?.documents?.map((doc) => (
             <li key={doc.id}>
@@ -141,12 +202,14 @@ export const ClientLoanValidation = () => {
                 <button onClick={() => handleDownload(doc.id, doc.name)}>
                     Descargar
                 </button>
-                <button onClick={() => handleDocumentApproved(doc.id, doc)}>
-                    Aprobar
-                </button>
+                { loan.fase === "En Revision Inicial" && doc.approved !== true &&(
+                  <button onClick={() => handleDocumentApproved(doc.id, doc)}>
+                      Aprobar
+                  </button>
+                )}
             </li>
         ))}
-        {showAdditionalFields && loan.fase === "Revision Inicial"&&(
+        {showAdditionalFields && loan.fase === "En Revision Inicial"&&(
           <div className="additional-fields">
             <h3>Para Aprobar debe rellenar estos campos</h3>
             <div className="field-container">
@@ -191,31 +254,39 @@ export const ClientLoanValidation = () => {
                 <button onClick={() => handleDownload(doc.id, doc.name)}>
                     Descargar
                 </button>
-                <button onClick={() => handleDocumentApproved(doc.id, doc)}>
-                    Aprobar
-                </button>
+                { loan.fase === "Revision Inicial" && doc.approved !== true &&(
+                  <button onClick={() => handleDocumentApproved(doc.id, doc)}>
+                      Aprobar
+                  </button>
+                )}
             </li>
         ))}
-        <div className="relative">
-          {loan.savings === null &&(
-            <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
-          )}
-        </div>
-        <div className="relative">
-          {saving.result === "Revision Adicional" &&(
-            <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
-          )}
-        </div>
-        <div className="relative">
-          {loan.savings !== null && saving.result !== "Revision Adicional" &&(
-            <li>La cuenta de Ahorros esta {saving.result}</li>
-          )}
-        </div>
-        <div className="relative">
-          {loan.fase === "En Revision Inicial" && (
-             <button onClick={() => handleDocumentError()}>Error en los Archivos</button>
-          )}
-        </div>
+        {loan.savings === null &&(
+          <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
+        )}
+        {saving.result === "Revision Adicional" &&(
+          <button onClick={() => handleSavings()}>Validar Cuenta de ahorros</button>
+        )}
+        {loan.savings !== null && saving.result !== "Revision Adicional" &&(
+          <li>La cuenta de Ahorros esta {saving.result}</li>
+        )}
+        {loan.fase === "En Revision Inicial" && !showMessage &&(
+          <button onClick={() => setShowMessage(true)}>Rechazar</button>
+        )}
+        {showMessage &&(
+          <div>
+            <h3>Por favor indique el motivo de rechazo</h3>
+            <input
+                type="text"
+                id="rejectMessage"
+                value={rejectMessage}
+                onChange={(e) => setRejectMessage(e.target.value)}
+                className="form-control text-black"
+              />
+            <button onClick={handleReject}>Enviar</button>
+            <button onClick={() => setShowMessage(false)}>Cancelar</button>
+          </div>
+        )}
       </ul>
     </div>
   );

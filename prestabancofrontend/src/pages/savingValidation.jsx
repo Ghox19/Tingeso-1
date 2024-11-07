@@ -195,7 +195,6 @@ export const SavingValidation = () => {
                   className="w-full md:w-auto px-6 py-2.5 bg-[#2F3429] hover:bg-[#2F3429]/80 
                             text-white text-xl font-medium rounded-lg transition-colors duration-200 
                             focus:outline-none focus:ring-2 focus:ring-[#2F3429]/50"
-                            Guardar Datos
                             
                 >
                   Guardar Datos

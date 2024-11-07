@@ -233,7 +233,7 @@ public class ClientLoanService {
 
         double deductionAmount = clientLoan.getLoanAmount() * form.getDeduction();
         double commission = clientLoan.getLoanAmount() * 0.01;
-        int newMensualPay = (int) (clientLoan.getMensualPay() + deductionAmount + commission);
+        int newMensualPay = (int) (clientLoan.getMensualPay() + deductionAmount + form.getFireInsurance());
         clientLoan.setMensualPay(newMensualPay);
         clientLoan.setDeduction(form.getDeduction());
         clientLoan.setFireInsurance(form.getFireInsurance());
@@ -247,6 +247,51 @@ public class ClientLoanService {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Se PreAprobo Correctamente el Prestamo");
+    }
+
+    public ResponseEntity<Object> updateFinalApproved(ClientLoanFinalApprovedForm form){
+        Optional<ClientLoanEntity> clientLoanOp = clientLoanRepository.findById(form.getId());
+
+        if (clientLoanOp.isEmpty()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("No se encontro la Solicitud");
+        }
+
+        ClientLoanEntity clientLoan = clientLoanOp.get();
+
+        if (form.getFase().equals("Desembolso")){
+            clientLoan.setFase(form.getFase());
+            clientLoanRepository.save(clientLoan);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body("Se Desembolso Correctamente el Prestamo");
+        } else {
+            clientLoan.setFase(form.getFase());
+            clientLoan.setMessage("Rechazado porque el cliente no acepto las condiciones");
+            clientLoanRepository.save(clientLoan);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body("Se Desembolso Correctamente el Prestamo");
+        }
+    }
+
+    public ResponseEntity<Object> updateReject(ClientLoanRejectForm form){
+        Optional<ClientLoanEntity> clientLoanOp = clientLoanRepository.findById(form.getId());
+
+        if (clientLoanOp.isEmpty()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("No se encontro la Solicitud");
+        }
+
+        ClientLoanEntity clientLoan = clientLoanOp.get();
+        clientLoan.setFase("Rechazado");
+        clientLoan.setMessage(form.getMessage());
+        clientLoanRepository.save(clientLoan);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Se Rechazo Correctamente el Prestamo");
     }
 
     public Integer calculateMensualPay (CalculatorForm calculatorForm){

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -185,7 +186,7 @@ public class SavingService {
         Optional<SavingEntity> savingEntity = savingRepository.findById(form.getId());
 
         if(savingEntity.isPresent()){
-            if(form.getResult() == "Aprobado"){
+            if(Objects.equals(form.getResult(), "Aprobado")){
                 savingEntity.get().setResult(form.getResult());
                 savingRepository.save(savingEntity.get());
                 return ResponseEntity
