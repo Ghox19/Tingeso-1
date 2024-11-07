@@ -268,7 +268,7 @@ export const CreditCalculator = () => {
         
           {/* Sección de Valor Obtenido y Botones */}
           <div className="flex flex-col items-center translate-y-16">
-            <div className="text-white text-4xl mb-4">{labelValue}</div>
+            <div className="text-white text-4xl mb-4">${labelValue}</div>
             <div className="flex justify-center gap-4">
               <button 
                 type="button" 

@@ -55,7 +55,7 @@ export const LoanCard = ({ name, description, maxYears, minInterest, maxInterest
       <button 
         onClick={handleClick}
         className="mt-8 w-1/2 mx-auto block text-xl py-2 px-4 bg-[#2A353D] text-white rounded-lg
-        hover:bg-[#3D2A3B] transition-colors duration-300 font-medium"
+        hover:bg-[#232E37] transition-colors duration-300 font-medium"
       >
         Solicitar Préstamo
       </button>
